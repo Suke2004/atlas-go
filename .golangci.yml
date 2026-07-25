@@ -1,0 +1,49 @@
+﻿# golangci-lint configuration for Atlas
+# Docs: https://golangci-lint.run/usage/configuration/
+
+run:
+  timeout: 5m
+  go: "1.23"
+
+linters:
+  enable:
+    - errcheck        # Check that errors are handled
+    - govet           # Report likely mistakes
+    - staticcheck     # Go static analysis
+    - unused          # Check for unused code
+    - gofmt           # Check formatting
+    - goimports       # Check import ordering
+    - misspell        # Catch spelling mistakes in comments
+    - gocritic        # Opinionated linting
+    - revive          # Fast, extensible linter
+
+linters-settings:
+  errcheck:
+    # Allow ignoring errors from fmt.Println, log.Sync, etc.
+    exclude-functions:
+      - fmt.Println
+      - fmt.Printf
+      - fmt.Fprintf
+      - (go.uber.org/zap.Logger).Sync
+
+  revive:
+    rules:
+      - name: exported
+        arguments:
+          - "checkPrivateReceivers"
+          - "sayRepetitiveInsteadOfStutters"
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+
+issues:
+  exclude-rules:
+    # Ignore long lines in generated files
+    - path: internal/db/
+      linters: [revive, gocritic]
+    # Ignore unused in test files
+    - path: _test\.go
+      linters: [unused]

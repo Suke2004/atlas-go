@@ -1,32 +1,72 @@
-# If you prefer the allow list template instead of the deny list, see community template:
-# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
-# Binaries for programs and plugins
+# .gitignore for Atlas
+
+# Binaries
+bin/
+tmp/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Data directory (contains user data — never commit)
+data/**
+!data/**/.gitkeep
+
+# Air temp dir
+tmp/
+
+
+# Templ generated files
+*_templ.go
+
+# sqlc generated files (optional — some teams commit these)
+# internal/db/*.go
+
+# Go
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
-
-# Test binary, built with `go test -c`
 *.test
-
-# Code coverage profiles and other test artifacts
 *.out
-coverage.*
-*.coverprofile
-profile.cov
+coverage.out
+coverage.html
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
-# Go workspace file
+# Go workspace
 go.work
 go.work.sum
 
-# env file
-.env
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
 
-# Editor/IDE
-# .idea/
-# .vscode/
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+.docker/
+
+# Node (if TailwindCSS CLI is used)
+node_modules/
+npm-debug.log*
+
+# Test artifacts
+testdata/tmp/

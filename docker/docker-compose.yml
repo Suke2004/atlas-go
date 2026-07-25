@@ -1,0 +1,56 @@
+﻿# Atlas Docker Compose
+# Usage:
+#   docker compose up -d            # Start Atlas only
+#   docker compose --profile ai up  # Start Atlas + Ollama (local AI)
+
+services:
+  atlas:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+    container_name: atlas
+    restart: unless-stopped
+    ports:
+      - "${ATLAS_PORT:-8080}:8080"
+    environment:
+      ATLAS_ENV:             ${ATLAS_ENV:-production}
+      ATLAS_PORT:            8080
+      ATLAS_DB_PATH:         /app/data/db/atlas.db
+      ATLAS_SESSION_SECRET:  ${ATLAS_SESSION_SECRET:?ATLAS_SESSION_SECRET is required}
+      ATLAS_SESSION_MAX_AGE: ${ATLAS_SESSION_MAX_AGE:-86400}
+      ATLAS_UPLOAD_PATH:     /app/data/uploads
+      ATLAS_MAX_UPLOAD_MB:   ${ATLAS_MAX_UPLOAD_MB:-50}
+      ATLAS_AI_PROVIDER:     ${ATLAS_AI_PROVIDER:-ollama}
+      ATLAS_AI_API_KEY:      ${ATLAS_AI_API_KEY:-}
+      ATLAS_AI_BASE_URL:     ${ATLAS_AI_BASE_URL:-http://ollama:11434}
+      ATLAS_AI_MODEL:        ${ATLAS_AI_MODEL:-llama3.2}
+      ATLAS_THEME_DEFAULT:   ${ATLAS_THEME_DEFAULT:-system}
+      ATLAS_LOG_LEVEL:       ${ATLAS_LOG_LEVEL:-info}
+    volumes:
+      # /data is the only persistent volume — back this up.
+      - atlas_data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Ollama: local LLM backend — activate with: docker compose --profile ai up
+  ollama:
+    image: ollama/ollama:latest
+    container_name: atlas-ollama
+    profiles: ["ai"]
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  atlas_data:
+    name: atlas_data
+  ollama_data:
+    name: atlas_ollama_data

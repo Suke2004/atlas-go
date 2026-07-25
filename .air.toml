@@ -1,0 +1,36 @@
+﻿# .air.toml — Air hot-reload configuration for Atlas development
+# Docs: https://github.com/air-verse/air
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  # Command run on every file change
+  cmd = "go build -o ./tmp/atlas ./cmd/atlas"
+  # Binary to execute after build
+  bin = "./tmp/atlas"
+  # Full build command for reference (used in pre_cmd)
+  full_bin = "./tmp/atlas"
+  # Files and directories to watch
+  include_ext = ["go", "templ", "sql", "html", "css", "js"]
+  exclude_dir  = ["tmp", "build", "data", "vendor", "node_modules", ".git"]
+  exclude_file = []
+  # Kill the running binary before rebuilding
+  kill_delay = "200ms"
+  # Rerun on error (avoids Air exiting on compile error)
+  rerun = false
+  # Log the build command output
+  log = "air.log"
+
+[color]
+  main    = "magenta"
+  watcher = "cyan"
+  build   = "yellow"
+  runner  = "green"
+
+[log]
+  time = false
+
+[misc]
+  # Remove tmp/ on exit
+  clean_on_exit = true
