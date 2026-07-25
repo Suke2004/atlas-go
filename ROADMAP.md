@@ -1,4 +1,4 @@
-﻿# Roadmap
+# Roadmap
 
 > Atlas is a self-hosted personal operating system. This roadmap tracks planned releases.
 > See uture_plans.md for full feature details.
@@ -9,7 +9,7 @@
 
 | Release | Status |
 |---------|--------|
-| v0.1.0 — Foundation | 🔄 In development |
+| v0.1.0 — Foundation | ✅ Shipped (2026-07-26) |
 | v0.2.0 — Projects + Tasks | ⬜ Planned |
 | v0.3.0 — Knowledge + Journal + Search | ⬜ Planned |
 | v0.4.0 — Dashboard + Settings | ⬜ Planned |
@@ -18,15 +18,15 @@
 
 ---
 
-## v0.1.0 — Foundation
+## v0.1.0 — Foundation *(Shipped 2026-07-26)*
 
 - [x] PRD, TRD, and architecture documentation
-- [ ] Go server with Chi router and Templ templates
-- [ ] SQLite + WAL + all migrations
-- [ ] First-run setup wizard
-- [ ] Session-based authentication (login, logout, CSRF)
-- [ ] Light / Dark / System theme system
-- [ ] Docker + GitHub Actions CI
+- [x] Go server with Chi router and Templ templates
+- [x] SQLite + WAL + all migrations
+- [x] First-run setup wizard
+- [x] Session-based authentication (login, logout, CSRF)
+- [x] Light / Dark / System theme system
+- [x] Docker + GitHub Actions CI
 
 ---
 
