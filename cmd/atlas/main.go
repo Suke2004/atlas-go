@@ -29,6 +29,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Suke2004/atlas-go/internal/config"
+	"github.com/Suke2004/atlas-go/internal/db"
 	"github.com/Suke2004/atlas-go/internal/health"
 	"github.com/Suke2004/atlas-go/internal/logger"
 )
@@ -65,7 +66,19 @@ func main() {
 		}
 	}
 
-	// ── 4. Router ──────────────────────────────────────────────────────────
+	// ── 4. Database & Migrations ───────────────────────────────────────────
+	database, err := db.Open(cfg.DBPath)
+	if err != nil {
+		log.Fatal("failed to open database", zap.Error(err))
+	}
+	defer database.Close()
+
+	if err := db.MigrateUp(database.Raw); err != nil {
+		log.Fatal("failed to apply migrations", zap.Error(err))
+	}
+	log.Info("database migrations applied successfully", zap.String("db_path", cfg.DBPath))
+
+	// ── 5. Router ──────────────────────────────────────────────────────────
 	r := chi.NewRouter()
 
 	// Core middleware — order matters.

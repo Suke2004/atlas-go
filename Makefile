@@ -1,4 +1,4 @@
-﻿# Atlas Makefile
+# Atlas Makefile
 # All developer commands are defined here.
 # Run `make help` to see available commands.
 
@@ -8,7 +8,7 @@ CMD         := ./cmd/atlas
 BUILD_DIR   := ./build
 VERSION     ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 LDFLAGS     := -ldflags "-s -w -X main.version=$(VERSION) -X github.com/Suke2004/atlas-go/internal/health.version=$(VERSION)"
-CGO_ENABLED := 1
+CGO_ENABLED ?= 0
 
 # Colours for output
 GREEN  := \033[0;32m
