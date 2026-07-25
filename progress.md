@@ -47,7 +47,7 @@
 |-------|------|--------|---------|-----------|-------|
 | 0 | Scaffolding | ✅ | 2026-07-26 | 2026-07-26 | Go server, Makefile, Air, Docker, /data layout |
 | 1 | Database | ✅ | 2026-07-26 | 2026-07-26 | Migrations, sqlc, WAL, FTS5 triggers |
-| 2 | Auth + Setup Wizard | ⬜ | — | — | First-run wizard, login/logout, sessions |
+| 2 | Auth + Setup Wizard | ✅ | 2026-07-26 | 2026-07-26 | First-run wizard, login/logout, sessions |
 | 3 | Layout Shell | ⬜ | — | — | Sidebar, topbar, theme system |
 | 4 | Projects Module | ⬜ | — | — | CRUD, milestones, timeline |
 | 5 | Tasks Module | ⬜ | — | — | List, Kanban, task dependencies |
@@ -108,19 +108,19 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| internal/setup/service.go | ⬜ | IsFirstRun, CreateFirstUser, SeedDemoData |
-| internal/setup/middleware.go | ⬜ | FirstRunGate redirect |
-| internal/setup/handler.go | ⬜ | /setup, /setup/demo-choice, /setup/seed |
-| 	emplates/setup/wizard.templ | ⬜ | Multi-step first-run form |
-| 	emplates/setup/demo_choice.templ | ⬜ | Yes/No demo data |
-| internal/auth/service.go | ⬜ | Authenticate, CreateSession, ValidateSession |
-| internal/auth/middleware.go | ⬜ | AuthRequired, RedirectIfAuthenticated |
-| internal/auth/handler.go | ⬜ | GET/POST /login, POST /logout |
-| 	emplates/auth/login.templ | ⬜ | Login form |
-| Session cookie (HTTP-only, SameSite=Lax) | ⬜ | |
-| CSRF middleware wired | ⬜ | All POST/PUT/DELETE protected |
-| Rate limiting on /login | ⬜ | ≤5 attempts/minute |
-| Login e2e test | ⬜ | |
+| `internal/setup/service.go` | ✅ | IsFirstRun, CreateFirstUser, SeedDemoData |
+| `internal/setup/middleware.go` | ✅ | FirstRunGate redirect |
+| `internal/setup/handler.go` | ✅ | /setup, /setup/demo-choice, /setup/seed |
+| `templates/setup/wizard.templ` | ✅ | Multi-step first-run form |
+| `templates/setup/demo_choice.templ` | ✅ | Yes/No demo data |
+| `internal/auth/service.go` | ✅ | Authenticate, CreateSession, ValidateSession |
+| `internal/auth/middleware.go` | ✅ | AuthRequired, RedirectIfAuthenticated |
+| `internal/auth/handler.go` | ✅ | GET/POST /login, POST /logout |
+| `templates/auth/login.templ` | ✅ | Login form |
+| Session cookie (HTTP-only, SameSite=Lax) | ✅ | |
+| CSRF middleware wired | ✅ | All POST/PUT/DELETE protected |
+| Rate limiting on /login | ✅ | ≤5 attempts/minute |
+| Login e2e test | ✅ | |
 
 ---
 
@@ -336,7 +336,7 @@ Only after every box is checked is the milestone truly complete.
 |-------|------|--------|
 | 0 — Scaffolding | [docs/retros/phase-0.md](docs/retros/phase-0.md) | ✅ Written |
 | 1 — Database | [docs/retros/phase-1.md](docs/retros/phase-1.md) | ✅ Written |
-| 2 — Auth + Wizard | [docs/retros/phase-2.md](docs/retros/phase-2.md) | ⬜ Not written |
+| 2 — Auth + Wizard | [docs/retros/phase-2.md](docs/retros/phase-2.md) | ✅ Written |
 | 3 — Layout Shell | [docs/retros/phase-3.md](docs/retros/phase-3.md) | ⬜ Not written |
 | 4 — Projects | [docs/retros/phase-4.md](docs/retros/phase-4.md) | ⬜ Not written |
 | 5 — Tasks | [docs/retros/phase-5.md](docs/retros/phase-5.md) | ⬜ Not written |

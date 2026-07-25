@@ -4,16 +4,6 @@
 // Why:  main.go is the only place where concrete types are constructed and
 //       injected into their dependents. Nothing else in the codebase
 //       instantiates its own dependencies (no global vars, no init()).
-// How:
-//  1. Load config (env vars via Viper)
-//  2. Build logger (Zap — console in dev, JSON in prod)
-//  3. Create /data directories if they don't exist
-//  4. Register routes on a Chi router
-//  5. Start HTTP server — block until shutdown signal
-//
-// Phase 0: Server starts with /health only.
-// Phase 1: Database connection added here.
-// Phase 2: Auth middleware and /setup route added here.
 package main
 
 import (
@@ -28,10 +18,12 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
 
+	"github.com/Suke2004/atlas-go/internal/auth"
 	"github.com/Suke2004/atlas-go/internal/config"
 	"github.com/Suke2004/atlas-go/internal/db"
 	"github.com/Suke2004/atlas-go/internal/health"
 	"github.com/Suke2004/atlas-go/internal/logger"
+	"github.com/Suke2004/atlas-go/internal/setup"
 )
 
 func main() {
@@ -49,8 +41,6 @@ func main() {
 	)
 
 	// ── 3. Data directories ────────────────────────────────────────────────
-	// Ensure /data subdirectories exist at startup so later phases
-	// (DB, uploads) never fail because the path is missing.
 	dataDirs := []string{
 		"data/db",
 		"data/uploads",
@@ -78,19 +68,50 @@ func main() {
 	}
 	log.Info("database migrations applied successfully", zap.String("db_path", cfg.DBPath))
 
-	// ── 5. Router ──────────────────────────────────────────────────────────
+	// ── 5. Services & Handlers ─────────────────────────────────────────────
+	sessionStore := auth.NewStore(cfg.SessionSecret, cfg.SessionMaxAge)
+	authSvc := auth.NewService(database, sessionStore)
+	authHandler := auth.NewHandler(authSvc, log)
+
+	setupSvc := setup.NewService(database)
+	setupHandler := setup.NewHandler(setupSvc, authSvc, log)
+
+	// ── 6. Router ──────────────────────────────────────────────────────────
 	r := chi.NewRouter()
 
-	// Core middleware — order matters.
-	r.Use(middleware.RequestID)  // Attach X-Request-Id header to every request
-	r.Use(middleware.RealIP)     // Trust X-Forwarded-For behind a reverse proxy
-	r.Use(middleware.Recoverer)  // Recover from panics; log and return 500
-	r.Use(zapRequestLogger(log)) // Structured request logging
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Recoverer)
+	r.Use(zapRequestLogger(log))
 
-	// Public routes (no auth required)
+	// First-Run Gate Middleware — redirects to /setup if zero users exist
+	r.Use(setup.FirstRunGate(setupSvc))
+
+	// Public endpoints
 	r.Get("/health", health.Handler())
 
-	// ── 5. Server ──────────────────────────────────────────────────────────
+	// First-Run Setup routes
+	r.Get("/setup", setupHandler.ShowWizard)
+	r.Post("/setup", setupHandler.ProcessSetup)
+	r.Get("/setup/demo-choice", setupHandler.ShowDemoChoice)
+	r.Post("/setup/seed", setupHandler.ProcessDemoSeed)
+
+	// Auth routes
+	r.Get("/login", authHandler.ShowLogin)
+	r.Post("/login", authHandler.ProcessLogin)
+	r.Post("/logout", authHandler.Logout)
+
+	// Protected routes (Phase 3+ layout, dashboard, modules)
+	r.Group(func(protected chi.Router) {
+		protected.Use(auth.AuthRequired(authSvc))
+		protected.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			user := auth.GetUserFromContext(r.Context())
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			fmt.Fprintf(w, "<!DOCTYPE html><html><head><title>Atlas</title><script src='https://cdn.tailwindcss.com'></script></head><body class='bg-slate-950 text-white p-8'><div class='max-w-2xl mx-auto bg-slate-900 border border-slate-800 p-6 rounded-xl'><h1 class='text-2xl font-bold mb-2'>Atlas Workspace</h1><p class='text-slate-400 mb-4'>Welcome back, <strong>%s</strong>!</p><form action='/logout' method='POST'><button class='px-4 py-2 bg-rose-600 rounded-lg font-medium'>Log Out</button></form></div></body></html>", user.DisplayName)
+		})
+	})
+
+	// ── 7. Server ──────────────────────────────────────────────────────────
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Port),
 		Handler:      r,
@@ -99,7 +120,6 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	// Start in a goroutine so we can listen for shutdown signals.
 	go func() {
 		log.Info("Atlas listening", zap.String("addr", srv.Addr))
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -107,22 +127,14 @@ func main() {
 		}
 	}()
 
-	// Block until SIGINT or SIGTERM received.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
 	log.Info("Atlas shutting down gracefully...")
-	// Future phases: close DB, flush caches, drain in-flight requests here.
 	log.Info("Atlas stopped")
 }
 
-// zapRequestLogger returns a Chi middleware that logs every HTTP request
-// using Zap structured fields.
-//
-// Why not use chi/middleware.Logger? It writes to a plain io.Writer.
-// We want structured JSON fields (method, path, status, latency) so logs
-// are machine-parseable in production.
 func zapRequestLogger(log *zap.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

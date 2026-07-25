@@ -3,12 +3,14 @@ module github.com/Suke2004/atlas-go
 go 1.26.3
 
 require (
+	github.com/a-h/templ v0.3.1020
 	github.com/go-chi/chi/v5 v5.3.1
-	github.com/mattn/go-sqlite3 v1.14.48
+	github.com/gorilla/sessions v1.4.0
 	github.com/pressly/goose/v3 v3.27.3
 	github.com/spf13/viper v1.21.0
 	go.uber.org/zap v1.28.0
 	golang.org/x/crypto v0.54.0
+	modernc.org/sqlite v1.54.0
 )
 
 require (
@@ -16,6 +18,7 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.23 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
@@ -36,5 +39,4 @@ require (
 	modernc.org/libc v1.74.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.54.0 // indirect
 )
