@@ -17,6 +17,9 @@ data/**
 # Air temp dir
 tmp/
 
+# Agent skills installed via npx skills (never commit installed vendor skills)
+.agents/skills/
+
 
 # Templ generated files
 *_templ.go
