@@ -28,6 +28,7 @@ import (
 	"github.com/Suke2004/atlas-go/internal/logger"
 	"github.com/Suke2004/atlas-go/internal/projects"
 	"github.com/Suke2004/atlas-go/internal/setup"
+	"github.com/Suke2004/atlas-go/internal/tasks"
 	layouts "github.com/Suke2004/atlas-go/web/templates/layout"
 )
 
