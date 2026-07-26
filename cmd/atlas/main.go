@@ -83,16 +83,15 @@ func main() {
 	// ── 6. Router ──────────────────────────────────────────────────────────
 	r := chi.NewRouter()
 
+	// All middleware MUST be defined before any routes on Chi Mux
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(zapRequestLogger(log))
+	r.Use(setup.FirstRunGate(setupSvc))
 
 	// Serve local static assets (CSS, JS, icons)
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
-
-	// First-Run Gate Middleware — redirects to /setup if zero users exist
-	r.Use(setup.FirstRunGate(setupSvc))
 
 	// Public endpoints
 	r.Get("/health", health.Handler())
