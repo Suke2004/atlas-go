@@ -26,6 +26,7 @@ import (
 	"github.com/Suke2004/atlas-go/internal/db"
 	"github.com/Suke2004/atlas-go/internal/health"
 	"github.com/Suke2004/atlas-go/internal/logger"
+	"github.com/Suke2004/atlas-go/internal/projects"
 	"github.com/Suke2004/atlas-go/internal/setup"
 	layouts "github.com/Suke2004/atlas-go/web/templates/layout"
 )
@@ -80,6 +81,10 @@ func main() {
 	setupSvc := setup.NewService(database)
 	setupHandler := setup.NewHandler(setupSvc, authSvc, log)
 
+	projectsRepo := projects.NewRepository(database)
+	projectsSvc := projects.NewService(projectsRepo, nil)
+	projectsHandler := projects.NewHandler(projectsSvc, log)
+
 	// ── 6. Router ──────────────────────────────────────────────────────────
 	r := chi.NewRouter()
 
@@ -128,6 +133,18 @@ func main() {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			_ = layouts.Base("Dashboard", "/", username, dashContent).Render(r.Context(), w)
 		})
+
+		// Projects Module Routes
+		protected.Get("/projects", projectsHandler.List)
+		protected.Post("/projects", projectsHandler.Create)
+		protected.Get("/projects/{id}", projectsHandler.Detail)
+		protected.Post("/projects/{id}/edit", projectsHandler.Update)
+		protected.Post("/projects/{id}/delete", projectsHandler.Delete)
+		protected.Post("/projects/{id}/sync-github", projectsHandler.SyncGitHub)
+		protected.Post("/projects/{id}/import-issues", projectsHandler.ImportIssues)
+		protected.Post("/projects/{id}/milestones", projectsHandler.CreateMilestone)
+		protected.Post("/projects/{id}/milestones/{milestoneID}/toggle", projectsHandler.ToggleMilestone)
+		protected.Post("/projects/{id}/milestones/{milestoneID}/delete", projectsHandler.DeleteMilestone)
 	})
 
 	// ── 7. Server ──────────────────────────────────────────────────────────

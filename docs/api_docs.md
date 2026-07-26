@@ -103,17 +103,90 @@
 
 ---
 
+---
+
+## Projects Module (`internal/projects`) — Phase 4
+
+### 11. List Projects & Filter Tabs
+- **Route**: `GET /projects`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Query Parameters**:
+  - `status` (string, optional) — "all" | "active" | "completed" | "archived"
+- **Behavior**: Returns Project Cards grid with Tech Stack badges, GitHub star/fork metrics, progress bars, and status filters. Supports HTMX partial swap (`HX-Target: projects-grid`).
+- **Response Format**: `text/html; charset=utf-8`
+
+### 12. Create Project
+- **Route**: `POST /projects`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters** (`application/x-www-form-urlencoded`):
+  - `name` (string, required)
+  - `description` (string, optional)
+  - `status` (string, optional) — "active" | "completed" | "archived" | "on_hold"
+  - `color` (string, optional) — hex color e.g. "#6366f1"
+  - `target_date` (string, optional)
+  - `github_url` (string, optional) — e.g. "https://github.com/owner/repo"
+  - `tech_stack` (string, optional) — comma-separated e.g. "Go, SQLite, HTMX, TailwindCSS"
+- **Behavior**: Auto-queries GitHub API for repo stats and tech stack if `github_url` provided, inserts project record into SQLite, and redirects to `/projects`.
+- **Response**: `303 See Other` → `/projects`
+
+### 13. Project Detail View
+- **Route**: `GET /projects/{id}`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Description**: Renders Project Detail page with header, Tech Stack pills, GitHub Insights Card, Milestone Checklist, and edit/delete modals.
+- **Response Format**: `text/html; charset=utf-8`
+
+### 14. Update Project
+- **Route**: `POST /projects/{id}/edit`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `name`, `description`, `status`, `color`, `target_date`, `github_url`, `tech_stack`.
+- **Response**: `303 See Other` → `/projects/{id}`
+
+### 15. Delete Project
+- **Route**: `POST /projects/{id}/delete`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Behavior**: Deletes project and associated milestones from SQLite.
+- **Response**: `303 See Other` → `/projects`
+
+### 16. Sync GitHub Stats
+- **Route**: `POST /projects/{id}/sync-github`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Behavior**: Fetches latest repo stars, forks, open issues, primary language, and tech stack from GitHub API and updates SQLite.
+- **Response Format**: `text/html; charset=utf-8` (HTMX `GitHubCard` fragment)
+
+### 17. Import GitHub Issues as Milestones
+- **Route**: `POST /projects/{id}/import-issues`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Behavior**: Fetches open GitHub issues and converts them into project milestones.
+- **Response**: `303 See Other` → `/projects/{id}`
+
+### 18. Add Milestone
+- **Route**: `POST /projects/{id}/milestones`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `title` (string, required), `due_date` (string, optional).
+- **Behavior**: Inserts milestone, recalculates project progress %, and redirects.
+- **Response**: `303 See Other` → `/projects/{id}`
+
+### 19. Toggle Milestone Completion
+- **Route**: `POST /projects/{id}/milestones/{milestoneID}/toggle`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `completed` ("true" | "false")
+- **Behavior**: Toggles milestone completion state, records completion timestamp, recalculates project progress %, and redirects.
+- **Response**: `303 See Other` → `/projects/{id}`
+
+### 20. Delete Milestone
+- **Route**: `POST /projects/{id}/milestones/{milestoneID}/delete`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Behavior**: Deletes milestone, recalculates project progress %, and redirects.
+- **Response**: `303 See Other` → `/projects/{id}`
+
+---
+
 ## Planned API Endpoints (Upcoming Phases)
 
 | Phase | Method | Route | Description | Response Type |
 |-------|--------|-------|-------------|---------------|
-| **Phase 4** | `GET` | `/projects` | List project cards & status tabs | HTML Page / Partial |
-| **Phase 4** | `POST` | `/projects` | Create new project | HTML Redirect / Toast |
-| **Phase 4** | `GET` | `/projects/{id}` | Project detail, milestones, timeline | HTML Page |
-| **Phase 4** | `POST` | `/projects/{id}/sync-github` | Refresh GitHub repo stats & tech stack | HTMX Partial (`github_card`) |
-| **Phase 4** | `POST` | `/projects/{id}/milestones` | Add milestone to project | HTMX Partial |
-| **Phase 4** | `POST` | `/projects/{id}/milestones/{mID}/toggle` | Toggle milestone completion & recalculate % | HTMX Partial |
 | **Phase 5** | `GET` | `/tasks` | Task list & Kanban view | HTML Page / Partial |
 | **Phase 6** | `GET` | `/notes` | Knowledge Base editor & wiki links | HTML Page |
 | **Phase 8** | `GET` | `/journal` | Daily journal mood/energy entry | HTML Page |
 | **Phase 9** | `GET` | `/search` | Global search query | HTMX Search JSON/HTML |
+

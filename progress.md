@@ -49,7 +49,7 @@
 | 1 | Database | ✅ | 2026-07-26 | 2026-07-26 | Migrations, sqlc, WAL, FTS5 triggers |
 | 2 | Auth + Setup Wizard | ✅ | 2026-07-26 | 2026-07-26 | First-run wizard, login/logout, sessions |
 | 3 | Layout Shell | ✅ | 2026-07-26 | 2026-07-26 | Sidebar, topbar, theme system, static assets |
-| 4 | Projects Module | ⬜ | — | — | CRUD, milestones, timeline |
+| 4 | Projects Module | ✅ | 2026-07-26 | 2026-07-26 | CRUD, GitHub repo stats, Tech Stack badges, milestones |
 | 5 | Tasks Module | ⬜ | — | — | List, Kanban, task dependencies |
 | 6 | Knowledge Base | ⬜ | — | — | Markdown editor, note linking, autosave |
 | 7 | Dashboard | ⬜ | — | — | Live widgets (real data) |
@@ -144,16 +144,15 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| queries/projects.sql | ⬜ | All CRUD + milestones |
-| internal/projects/repository.go | ⬜ | sqlc wrapper |
-| internal/projects/service.go | ⬜ | Business logic, RecalculateProgress |
-| internal/projects/handler.go | ⬜ | All routes |
-| 	emplates/projects/list.templ | ⬜ | Card grid |
-| 	emplates/projects/detail.templ | ⬜ | Full detail page |
-| 	emplates/projects/form.templ | ⬜ | Create/edit inline |
-| 	emplates/projects/timeline.templ | ⬜ | Vertical timeline |
-| Milestone completion → progress update | ⬜ | |
-| Project CRUD integration test | ⬜ | |
+| `queries/projects.sql` | ✅ | All CRUD + milestones + GitHub stats |
+| `internal/projects/repository.go` | ✅ | sqlc wrapper |
+| `internal/projects/service.go` | ✅ | Business logic, RecalculateProgress, GitHub sync |
+| `internal/projects/handler.go` | ✅ | All routes & HTMX swap handlers |
+| `templates/projects/list.templ` | ✅ | Card grid with Tech Stack badges & filter tabs |
+| `templates/projects/detail.templ` | ✅ | Full detail page with GitHub Insights Card |
+| `templates/projects/github_card.templ` | ✅ | HTMX GitHub metrics partial component |
+| Milestone completion → progress update | ✅ | Auto recalculate % |
+| Project CRUD & GitHub integration test | ✅ | |
 
 ---
 
@@ -338,7 +337,7 @@ Only after every box is checked is the milestone truly complete.
 | 1 — Database | [docs/retros/phase-1.md](docs/retros/phase-1.md) | ✅ Written |
 | 2 — Auth + Wizard | [docs/retros/phase-2.md](docs/retros/phase-2.md) | ✅ Written |
 | 3 — Layout Shell | [docs/retros/phase-3.md](docs/retros/phase-3.md) | ✅ Written |
-| 4 — Projects | [docs/retros/phase-4.md](docs/retros/phase-4.md) | ⬜ Not written |
+| 4 — Projects | [docs/retros/phase-4.md](docs/retros/phase-4.md) | ✅ Written |
 | 5 — Tasks | [docs/retros/phase-5.md](docs/retros/phase-5.md) | ⬜ Not written |
 | 6 — Knowledge Base | [docs/retros/phase-6.md](docs/retros/phase-6.md) | ⬜ Not written |
 | 7 — Dashboard | [docs/retros/phase-7.md](docs/retros/phase-7.md) | ⬜ Not written |

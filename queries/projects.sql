@@ -1,6 +1,11 @@
 -- name: CreateProject :one
-INSERT INTO projects (user_id, name, description, status, color, target_date)
-VALUES (?, ?, ?, ?, ?, ?)
+INSERT INTO projects (
+    user_id, name, description, status, color, target_date,
+    github_url, github_stars, github_forks, github_open_issues, github_language, github_last_pushed_at, tech_stack
+) VALUES (
+    ?, ?, ?, ?, ?, ?,
+    ?, ?, ?, ?, ?, ?, ?
+)
 RETURNING *;
 
 -- name: GetProjectByID :one
@@ -12,9 +17,21 @@ SELECT * FROM projects
 WHERE user_id = ?
 ORDER BY created_at DESC;
 
+-- name: ListProjectsByStatus :many
+SELECT * FROM projects
+WHERE user_id = ? AND status = ?
+ORDER BY created_at DESC;
+
 -- name: UpdateProject :one
 UPDATE projects
-SET name = ?, description = ?, status = ?, color = ?, target_date = ?, updated_at = CURRENT_TIMESTAMP
+SET name = ?, description = ?, status = ?, color = ?, target_date = ?,
+    github_url = ?, tech_stack = ?, updated_at = CURRENT_TIMESTAMP
+WHERE id = ? AND user_id = ?
+RETURNING *;
+
+-- name: UpdateGitHubStats :one
+UPDATE projects
+SET github_stars = ?, github_forks = ?, github_open_issues = ?, github_language = ?, github_last_pushed_at = ?, tech_stack = ?, updated_at = CURRENT_TIMESTAMP
 WHERE id = ? AND user_id = ?
 RETURNING *;
 

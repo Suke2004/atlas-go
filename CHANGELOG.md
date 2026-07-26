@@ -10,13 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Application Layout Shell (`web/templates/layout/base.templ`, `sidebar.templ`, `topbar.templ`, `toast.templ`)
-- Local vendor static asset delivery (`web/static/js/htmx.min.js`, `alpine.min.js`, `lucide.min.js`, `app.css`)
-- Light / Dark / System theme switcher with instant `localStorage` head listener
-- HTMX SPA-like boosted navigation links (`hx-boost="true"`)
-- Global Search trigger button (`Ctrl+K`)
-- Reusable toast notification system with color variants and auto-dismiss
-- Layout component test suite (`tests/unit/layout_test.go`)
+- Projects Module (`internal/projects`): Project CRUD operations, status filters (*All*, *Active*, *Completed*, *Archived*), and color accent pills.
+- GitHub Integration & Live Metrics: GitHub repository URL import, live stars (⭐), forks (🍴), open issues (🐛), primary language, and last pushed date tracking.
+- Tech Stack Breakdown & Badges: Automated GitHub languages API detection and custom tech stack badge tags.
+- GitHub Action Triggers: One-click HTMX stats sync (`POST /projects/{id}/sync-github`) and GitHub open issue import as project milestones (`POST /projects/{id}/import-issues`).
+- Milestone Checklist & Progress Engine: Interactive milestone checkboxes with automatic project completion percentage recalculation (`Completed / Total * 100`).
+- API Documentation update (`docs/api_docs.md`): Registered 10 new HTTP endpoints.
+- Projects unit and integration test suite (`tests/unit/projects_test.go` & `tests/integration/projects_flow_test.go`).
+
 
 
 ---

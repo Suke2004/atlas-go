@@ -33,26 +33,33 @@ type Setting struct {
 }
 
 type Project struct {
-	ID                 int64        `json:"id" db:"id"`
-	UserID             int64        `json:"user_id" db:"user_id"`
-	Name               string       `json:"name" db:"name"`
-	Description        string       `json:"description" db:"description"`
-	Status             string       `json:"status" db:"status"`
-	Color              string       `json:"color" db:"color"`
-	ProgressPercentage int64        `json:"progress_percentage" db:"progress_percentage"`
-	TargetDate         sql.NullTime `json:"target_date" db:"target_date"`
-	CreatedAt          time.Time    `json:"created_at" db:"created_at"`
-	UpdatedAt          time.Time    `json:"updated_at" db:"updated_at"`
+	ID                 int64          `json:"id" db:"id"`
+	UserID             int64          `json:"user_id" db:"user_id"`
+	Name               string         `json:"name" db:"name"`
+	Description        string         `json:"description" db:"description"`
+	Status             string         `json:"status" db:"status"`
+	Color              string         `json:"color" db:"color"`
+	ProgressPercentage int64          `json:"progress_percentage" db:"progress_percentage"`
+	TargetDate         sql.NullString `json:"target_date" db:"target_date"`
+	GithubUrl          string         `json:"github_url" db:"github_url"`
+	GithubStars        int64          `json:"github_stars" db:"github_stars"`
+	GithubForks        int64          `json:"github_forks" db:"github_forks"`
+	GithubOpenIssues   int64          `json:"github_open_issues" db:"github_open_issues"`
+	GithubLanguage     string         `json:"github_language" db:"github_language"`
+	GithubLastPushedAt sql.NullString `json:"github_last_pushed_at" db:"github_last_pushed_at"`
+	TechStack          string         `json:"tech_stack" db:"tech_stack"`
+	CreatedAt          time.Time      `json:"created_at" db:"created_at"`
+	UpdatedAt          time.Time      `json:"updated_at" db:"updated_at"`
 }
 
 type Milestone struct {
-	ID          int64        `json:"id" db:"id"`
-	ProjectID   int64        `json:"project_id" db:"project_id"`
-	Title       string       `json:"title" db:"title"`
-	DueDate     sql.NullTime `json:"due_date" db:"due_date"`
-	IsCompleted bool         `json:"is_completed" db:"is_completed"`
-	CompletedAt sql.NullTime `json:"completed_at" db:"completed_at"`
-	CreatedAt   time.Time    `json:"created_at" db:"created_at"`
+	ID          int64          `json:"id" db:"id"`
+	ProjectID   int64          `json:"project_id" db:"project_id"`
+	Title       string         `json:"title" db:"title"`
+	DueDate     sql.NullString `json:"due_date" db:"due_date"`
+	IsCompleted bool           `json:"is_completed" db:"is_completed"`
+	CompletedAt sql.NullString `json:"completed_at" db:"completed_at"`
+	CreatedAt   time.Time      `json:"created_at" db:"created_at"`
 }
 
 type Task struct {

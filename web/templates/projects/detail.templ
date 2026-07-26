@@ -1,0 +1,213 @@
+package projects
+
+import (
+	"fmt"
+	"strings"
+	"github.com/Suke2004/atlas-go/internal/db"
+)
+
+templ Detail(project db.Project, milestones []db.Milestone, errorMsg string) {
+	<div class="space-y-8" x-data="{ showEditModal: false, showMilestoneModal: false }">
+		<!-- Navigation Breadcrumb -->
+		<div class="flex items-center gap-2 text-xs font-semibold text-slate-400">
+			<a href="/projects" hx-boost="true" class="hover:text-indigo-400 transition-colors">Projects</a>
+			<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600"></i>
+			<span class="text-white">{ project.Name }</span>
+		</div>
+
+		<!-- Project Header Card -->
+		<div class="p-8 rounded-2xl bg-slate-900/90 border border-slate-800 backdrop-blur-xl shadow-2xl space-y-6">
+			<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+				<div class="flex items-center gap-4">
+					<div class="w-4 h-12 rounded-full" style={ fmt.Sprintf("background-color: %s;", project.Color) }></div>
+					<div>
+						<div class="flex items-center gap-3">
+							<h1 class="text-3xl font-bold text-white tracking-tight">{ project.Name }</h1>
+							<span class={ "px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider " + statusBadgeClass(project.Status) }>
+								{ project.Status }
+							</span>
+						</div>
+						if project.Description != "" {
+							<p class="text-slate-400 text-sm mt-1">{ project.Description }</p>
+						}
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3">
+					<button @click="showEditModal = true" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-2 transition-all">
+						<i data-lucide="edit-3" class="w-4 h-4"></i>
+						<span>Edit Project</span>
+					</button>
+					<form action={ fmt.Sprintf("/projects/%d/delete", project.ID) } method="POST" onsubmit="return confirm('Are you sure you want to delete this project?');">
+						<button type="submit" class="px-4 py-2 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 text-xs font-semibold flex items-center gap-2 transition-all">
+							<i data-lucide="trash-2" class="w-4 h-4"></i>
+							<span>Delete</span>
+						</button>
+					</form>
+				</div>
+			</div>
+
+			<!-- Tech Stack Breakdown Pills -->
+			if project.TechStack != "" {
+				<div class="pt-2 border-t border-slate-800/60">
+					<div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+						<i data-lucide="layers" class="w-3.5 h-3.5 text-indigo-400"></i>
+						<span>Tech Stack</span>
+					</div>
+					<div class="flex flex-wrap gap-2">
+						for _, tag := range strings.Split(project.TechStack, ",") {
+							if strings.TrimSpace(tag) != "" {
+								<span class="px-3 py-1 rounded-lg bg-indigo-950/80 border border-indigo-800/60 text-xs font-semibold text-indigo-300 shadow-sm flex items-center gap-1.5">
+									<span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+									{ strings.TrimSpace(tag) }
+								</span>
+							}
+						}
+					</div>
+				</div>
+			}
+
+			<!-- Progress Header -->
+			<div class="pt-4 border-t border-slate-800/60 space-y-2">
+				<div class="flex justify-between items-center text-sm font-semibold">
+					<span class="text-slate-400">Milestone Progress</span>
+					<span id="project-progress-badge" class="text-indigo-400 font-bold text-base">{ fmt.Sprintf("%d%%", project.ProgressPercentage) }</span>
+				</div>
+				<div class="w-full h-3 rounded-full bg-slate-950 overflow-hidden">
+					<div class="h-full bg-gradient-to-r from-indigo-600 to-indigo-400 transition-all duration-300" style={ fmt.Sprintf("width: %d%%;", project.ProgressPercentage) }></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- GitHub Insights Card -->
+		@GitHubCard(project)
+
+		<!-- Milestones Checklist & Timeline -->
+		<div class="p-8 rounded-2xl bg-slate-900/90 border border-slate-800 backdrop-blur-xl shadow-2xl space-y-6">
+			<div class="flex items-center justify-between">
+				<div>
+					<h2 class="text-xl font-bold text-white">Project Milestones</h2>
+					<p class="text-slate-400 text-xs mt-0.5">Track key deliverables and deadlines.</p>
+				</div>
+				<button @click="showMilestoneModal = true" type="button" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center gap-2 transition-all">
+					<i data-lucide="plus" class="w-4 h-4"></i>
+					<span>Add Milestone</span>
+				</button>
+			</div>
+
+			if len(milestones) == 0 {
+				<div class="text-center py-8 text-slate-500 text-xs">
+					No milestones added yet. Click "Add Milestone" to set project goals.
+				</div>
+			} else {
+				<div class="space-y-3">
+					for _, m := range milestones {
+						<div class="flex items-center justify-between p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition-all">
+							<form action={ fmt.Sprintf("/projects/%d/milestones/%d/toggle", project.ID, m.ID) } method="POST" class="flex items-center gap-3">
+								<input type="checkbox" name="completed" value="true" checked?={ m.IsCompleted } onchange="this.form.submit()" class="w-5 h-5 rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"/>
+								<span class={ "text-sm font-medium transition-all " + milestoneTitleClass(m.IsCompleted) }>{ m.Title }</span>
+							</form>
+
+							<div class="flex items-center gap-3">
+								if m.IsCompleted {
+									<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold">Completed</span>
+								}
+								<form action={ fmt.Sprintf("/projects/%d/milestones/%d/delete", project.ID, m.ID) } method="POST">
+									<button type="submit" title="Delete Milestone" class="text-slate-500 hover:text-rose-400 transition-colors">
+										<i data-lucide="trash" class="w-4 h-4"></i>
+									</button>
+								</form>
+							</div>
+						</div>
+					}
+				</div>
+			}
+		</div>
+
+		<!-- Edit Project Modal -->
+		<div x-show="showEditModal" @click.outside="showEditModal = false" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" style="display: none;">
+			<div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 space-y-6">
+				<div class="flex items-center justify-between border-b border-slate-800 pb-4">
+					<h3 class="text-xl font-bold text-white">Edit Project</h3>
+					<button @click="showEditModal = false" type="button" class="text-slate-400 hover:text-white">
+						<i data-lucide="x" class="w-5 h-5"></i>
+					</button>
+				</div>
+
+				<form action={ fmt.Sprintf("/projects/%d/edit", project.ID) } method="POST" class="space-y-4">
+					<div>
+						<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Project Name</label>
+						<input type="text" name="name" value={ project.Name } required class="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+					</div>
+
+					<div>
+						<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Description</label>
+						<textarea name="description" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">{ project.Description }</textarea>
+					</div>
+
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Status</label>
+							<select name="status" class="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+								<option value="active" selected?={ project.Status == "active" }>Active</option>
+								<option value="completed" selected?={ project.Status == "completed" }>Completed</option>
+								<option value="archived" selected?={ project.Status == "archived" }>Archived</option>
+								<option value="on_hold" selected?={ project.Status == "on_hold" }>On Hold</option>
+							</select>
+						</div>
+						<div>
+							<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Accent Color</label>
+							<input type="color" name="color" value={ project.Color } class="w-full h-10 rounded-xl bg-slate-800/60 border border-slate-700 cursor-pointer"/>
+						</div>
+					</div>
+
+					<div>
+						<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">GitHub Repository URL</label>
+						<input type="text" name="github_url" value={ project.GithubUrl } placeholder="https://github.com/owner/repo" class="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+					</div>
+
+					<div>
+						<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Tech Stack Tags</label>
+						<input type="text" name="tech_stack" value={ project.TechStack } placeholder="Go, SQLite, HTMX, TailwindCSS" class="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+					</div>
+
+					<div class="pt-4 flex justify-end gap-3 border-t border-slate-800">
+						<button @click="showEditModal = false" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm">Cancel</button>
+						<button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm">Save Changes</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- New Milestone Modal -->
+		<div x-show="showMilestoneModal" @click.outside="showMilestoneModal = false" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" style="display: none;">
+			<div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 space-y-6">
+				<div class="flex items-center justify-between border-b border-slate-800 pb-4">
+					<h3 class="text-xl font-bold text-white">Add Milestone</h3>
+					<button @click="showMilestoneModal = false" type="button" class="text-slate-400 hover:text-white">
+						<i data-lucide="x" class="w-5 h-5"></i>
+					</button>
+				</div>
+
+				<form action={ fmt.Sprintf("/projects/%d/milestones", project.ID) } method="POST" class="space-y-4">
+					<div>
+						<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Milestone Title</label>
+						<input type="text" name="title" required placeholder="e.g. Implement Authentication" class="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+					</div>
+
+					<div class="pt-4 flex justify-end gap-3 border-t border-slate-800">
+						<button @click="showMilestoneModal = false" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm">Cancel</button>
+						<button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm">Add Milestone</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+}
+
+func milestoneTitleClass(completed bool) string {
+	if completed {
+		return "line-through text-slate-500"
+	}
+	return "text-slate-200"
+}
