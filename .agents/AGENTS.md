@@ -10,7 +10,7 @@
 
 - **Continuous Verification**: Continuously test and verify your work after every modification (`go build ./...` & `go test`). Catch and fix errors immediately to keep defects at zero.
 - **Clarify Before Acting**: If you have ANY doubt, ambiguity, or design trade-off, **STOP AND ASK THE USER FIRST**. Never make unverified assumptions about business logic or architecture.
-- **Documentation Sync**: Keep all documentation (`docs/`, `progress.md`, `CHANGELOG.md`, `ROADMAP.md`, `docs/retros/`) 100% updated in lockstep with code changes.
+- **Documentation Sync**: Keep all documentation (`docs/`, `docs/api_docs.md`, `progress.md`, `CHANGELOG.md`, `ROADMAP.md`, `docs/retros/`) 100% updated in lockstep with code changes.
 - **Branch & Push Discipline**: Commit logical steps incrementally and push commits to the respective feature branch (`feat/phase-N-...`) and `main` on remote origin.
 
 ---
@@ -37,9 +37,10 @@ When the user says **"goahead"** or prompts to continue/start a phase:
    - **Verify continuously**: Run `go build ./...` and `go test ./...` after every edit to catch errors instantly.
    - **Commit after every logical unit**: Create conventional commits (`feat(...)`, `fix(...)`, `docs(...)`, `test(...)`).
 
-4. **Step 4: Execute Milestone Ceremony, Documentation & Git Push**
+4. **Step 4: Execute Milestone Ceremony, API Docs, Documentation & Git Push**
    - Run full test suite: `powershell -Command "$env:CGO_ENABLED='0'; go test ./tests/unit/... ./tests/integration/... -v"`
    - Write phase retrospective: `docs/retros/phase-{N}.md`
+   - Update `docs/api_docs.md`: Record all new/modified HTTP API endpoints, request parameters, HTMX partial responses, and status codes.
    - Update `docs/` module documentation as per changes made.
    - Update `progress.md`: mark tasks completed `✅`, update dates and retros table.
    - Update `CHANGELOG.md` & `ROADMAP.md`.
