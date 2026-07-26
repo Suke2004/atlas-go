@@ -8,9 +8,9 @@ import (
 
 	"github.com/Suke2004/atlas-go/internal/db"
 	"github.com/Suke2004/atlas-go/internal/projects"
-	financetemplates "github.com/Suke2004/atlas-go/web/templates/finance"
 )
 
+// TransactionInput holds validated fields from the HTTP form.
 type TransactionInput struct {
 	Amount          float64 `json:"amount"`
 	Type            string  `json:"type"` // "income" | "expense"
@@ -18,9 +18,6 @@ type TransactionInput struct {
 	Description     string  `json:"description"`
 	TransactionDate string  `json:"transaction_date"`
 }
-
-type FinanceSummary = financetemplates.FinanceSummary
-type ProjectCostAttribution = financetemplates.ProjectCostAttribution
 
 type Service interface {
 	CreateTransaction(ctx context.Context, userID int64, input TransactionInput) (db.Transaction, error)

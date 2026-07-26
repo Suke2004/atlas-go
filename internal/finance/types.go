@@ -2,14 +2,14 @@ package finance
 
 import "github.com/Suke2004/atlas-go/internal/db"
 
-// ProjectCostAttribution shows how infrastructure costs map to projects.
+// ProjectCostAttribution represents how infrastructure cost is split across projects.
 type ProjectCostAttribution struct {
 	ProjectName string  `json:"project_name"`
 	MonthlyCost float64 `json:"monthly_cost"`
 	Percentage  int     `json:"percentage"`
 }
 
-// FinanceSummary is the aggregated view model for the finance dashboard.
+// FinanceSummary is the aggregated financial view for the dashboard.
 type FinanceSummary struct {
 	TotalIncome   float64                  `json:"total_income"`
 	TotalExpenses float64                  `json:"total_expenses"`

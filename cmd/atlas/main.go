@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -122,8 +124,10 @@ func main() {
 	r.Use(zapRequestLogger(log))
 	r.Use(setup.FirstRunGate(setupSvc))
 
-	// Serve local static assets (CSS, JS, icons)
-	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
+	// Serve local static assets (CSS, JS, icons) with robust Chi route matching
+	workDir, _ := os.Getwd()
+	filesDir := http.Dir(filepath.Join(workDir, "web", "static"))
+	FileServer(r, "/static", filesDir)
 
 	// Public endpoints
 	r.Get("/health", health.Handler())
@@ -256,3 +260,25 @@ func zapRequestLogger(log *zap.Logger) func(http.Handler) http.Handler {
 		})
 	}
 }
+
+// FileServer conveniently sets up a http.FileServer route to serve
+// static files from a http.FileSystem.
+func FileServer(r chi.Router, path string, root http.FileSystem) {
+	if strings.Contains(path, "}") || strings.Contains(path, "*") {
+		panic("FileServer does not permit URL parameters.")
+	}
+
+	if path != "/" && path[len(path)-1] != '/' {
+		r.Get(path, http.RedirectHandler(path+"/", http.StatusMovedPermanently).ServeHTTP)
+		path += "/"
+	}
+	path += "*"
+
+	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
+		rctx := chi.RouteContext(r.Context())
+		pathPrefix := strings.TrimSuffix(rctx.RoutePattern(), "/*")
+		fs := http.StripPrefix(pathPrefix, http.FileServer(root))
+		fs.ServeHTTP(w, r)
+	})
+}
+

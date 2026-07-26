@@ -27,6 +27,26 @@ func NewHandler(service Service, logger *zap.Logger) *Handler {
 	}
 }
 
+// toTemplateSummary converts the service FinanceSummary to the template type.
+func toTemplateSummary(s FinanceSummary) financetemplates.FinanceSummary {
+	costs := make([]financetemplates.ProjectCostAttribution, len(s.ProjectCosts))
+	for i, c := range s.ProjectCosts {
+		costs[i] = financetemplates.ProjectCostAttribution{
+			ProjectName: c.ProjectName,
+			MonthlyCost: c.MonthlyCost,
+			Percentage:  c.Percentage,
+		}
+	}
+	return financetemplates.FinanceSummary{
+		TotalIncome:   s.TotalIncome,
+		TotalExpenses: s.TotalExpenses,
+		NetSavings:    s.NetSavings,
+		SavingsRate:   s.SavingsRate,
+		ProjectCosts:  costs,
+		TopExpenses:   s.TopExpenses,
+	}
+}
+
 // GET /finance
 func (h *Handler) Index(w http.ResponseWriter, r *http.Request) {
 	user := auth.GetUserFromContext(r.Context())
@@ -41,9 +61,10 @@ func (h *Handler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	summary, _ := h.service.GetFinanceSummary(r.Context(), user.ID)
+	tmplSummary := toTemplateSummary(summary)
 
 	pageContent := templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
-		return financetemplates.Finance(txns, summary).Render(ctx, w)
+		return financetemplates.Finance(txns, tmplSummary).Render(ctx, w)
 	})
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

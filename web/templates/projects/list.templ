@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"strings"
 	"github.com/Suke2004/atlas-go/internal/db"
-	"github.com/Suke2004/atlas-go/internal/projects"
 )
 
-templ List(projectList []db.Project, summary projects.ProjectsSummary, currentFilter string, viewMode string, tagFilter string, searchQuery string, errorMsg string) {
+templ List(projectList []db.Project, summary ProjectsSummary, currentFilter string, viewMode string, tagFilter string, searchQuery string, errorMsg string) {
 	<div class="space-y-8" x-data="{ showDrawer: false }">
 		<!-- Executive Hero Summary Banner -->
 		<div class="p-6 md:p-8 rounded-3xl glass-panel relative overflow-hidden">
