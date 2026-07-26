@@ -29,6 +29,7 @@ import (
 	"github.com/Suke2004/atlas-go/internal/projects"
 	"github.com/Suke2004/atlas-go/internal/setup"
 	"github.com/Suke2004/atlas-go/internal/tasks"
+	dashtemplates "github.com/Suke2004/atlas-go/web/templates/dashboard"
 	layouts "github.com/Suke2004/atlas-go/web/templates/layout"
 )
 
@@ -121,19 +122,22 @@ func main() {
 	r.Group(func(protected chi.Router) {
 		protected.Use(auth.AuthRequired(authSvc))
 
-		// Dashboard route (Root Layout Shell)
+		// Dashboard route (Root Layout Shell & Executive Command Center)
 		protected.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			user := auth.GetUserFromContext(r.Context())
 			username := "Owner"
+			var userID int64
 			if user != nil {
 				username = user.DisplayName
+				userID = user.ID
 			}
 
-			dashContent := templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
-				html := `<div class="space-y-6"><div class="p-6 rounded-2xl bg-gradient-to-r from-indigo-900/40 via-slate-900 to-slate-900 border border-indigo-500/20"><h2 class="text-2xl font-bold text-white mb-2">Welcome to your Atlas Operating System</h2><p class="text-slate-400 text-sm max-w-xl">Everything in your life, organized in one self-hosted workspace. Use the sidebar to navigate your Projects, Tasks, Knowledge Base, and Daily Journal.</p></div></div>`
-				_, err := io.WriteString(w, html)
-				return err
-			})
+			projSummary, _ := projectsSvc.GetProjectsSummary(r.Context(), userID)
+			activeProjects, _ := projectsRepo.ListProjects(r.Context(), userID)
+			taskSummary, _ := tasksSvc.GetTasksSummary(r.Context(), userID)
+			focusTasks, _ := tasksSvc.ListTasks(r.Context(), userID, "todo", "high", "all", 0, "")
+
+			dashContent := dashtemplates.Dashboard(username, projSummary, activeProjects, taskSummary, focusTasks)
 
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			_ = layouts.Base("Dashboard", "/", username, dashContent).Render(r.Context(), w)
