@@ -140,6 +140,42 @@ This document records all HTTP API routes, request parameters, responses, HTMX p
 - **Auth Required**: Yes (`AuthRequired` middleware)
 - **Response**: `303 See Other` → `/tasks`
 
+### 25. List Notes & Knowledge Base View
+- **Route**: `GET /notes`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Query Parameters**: `tag`, `search`, `view` ("grid" | "list").
+- **Response Format**: `text/html; charset=utf-8`
+
+### 26. Render New Note Editor
+- **Route**: `GET /notes/new`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Query Parameters**: `template` ("adr" | "meeting" | "brainstorm").
+- **Response Format**: `text/html; charset=utf-8`
+
+### 27. Create Note
+- **Route**: `POST /notes`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `title`, `content`, `project_id`, `tags`, `is_pinned`.
+- **Response**: `303 See Other` → `/notes/{id}`
+
+### 28. Render Note Detail / Editor
+- **Route**: `GET /notes/{id}`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Response Format**: `text/html; charset=utf-8`
+
+### 29. Update Note Content & Wiki Links
+- **Route**: `POST /notes/{id}/edit`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `title`, `content`, `project_id`, `tags`, `is_pinned`.
+- **Response**: `303 See Other` → `/notes/{id}`
+
+### 30. Background Autosave Note
+- **Route**: `POST /notes/{id}/autosave`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `title`, `content`.
+- **Response Format**: `text/html; charset=utf-8` (`200 OK` fragment)
+
+
 ---
 
 ## Planned API Endpoints (Upcoming Phases)

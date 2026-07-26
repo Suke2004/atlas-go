@@ -1,0 +1,197 @@
+package notes
+
+import (
+	"fmt"
+	"strings"
+	"github.com/Suke2004/atlas-go/internal/db"
+)
+
+templ Editor(noteDetails NoteWithDetails, availableProjects []db.Project, isNew bool) {
+	<div class="space-y-6" x-data="{
+		title: '',
+		content: '',
+		wordCount: 0,
+		readingTime: '1m read',
+		autosaveStatus: 'Saved just now',
+		init() {
+			this.title = document.getElementById('note-title-input') ? document.getElementById('note-title-input').value : '';
+			this.content = document.getElementById('note-content-textarea') ? document.getElementById('note-content-textarea').value : '';
+			this.updateStats();
+		},
+		updateStats() {
+			const words = this.content.trim() ? this.content.trim().split(/\s+/).length : 0;
+			this.wordCount = words;
+			this.readingTime = Math.max(1, Math.ceil(words / 200)) + 'm read';
+		},
+		insertFormatting(syntax) {
+			const textarea = document.getElementById('note-content-textarea');
+			if (!textarea) return;
+			const start = textarea.selectionStart;
+			const end = textarea.selectionEnd;
+			const text = textarea.value;
+			const selected = text.substring(start, end) || 'text';
+			let replacement = '';
+			switch(syntax) {
+				case 'bold': replacement = '**' + selected + '**'; break;
+				case 'italic': replacement = '*' + selected + '*'; break;
+				case 'heading': replacement = '# ' + selected; break;
+				case 'code': replacement = '```\n' + selected + '\n```'; break;
+				case 'quote': replacement = '> ' + selected; break;
+				case 'wikilink': replacement = '[[' + selected + ']]'; break;
+				default: replacement = selected;
+			}
+			textarea.value = text.substring(0, start) + replacement + text.substring(end);
+			this.content = textarea.value;
+			this.updateStats();
+		}
+	}">
+		<!-- Editor Header & Control Bar -->
+		<div class="p-6 rounded-3xl glass-panel flex flex-col md:flex-row md:items-center justify-between gap-4">
+			<div class="flex items-center gap-3">
+				<a href="/notes" hx-boost="true" class="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-colors">
+					<i data-lucide="arrow-left" class="w-5 h-5"></i>
+				</a>
+				<div>
+					<span class="text-xs font-mono-code text-slate-400">Knowledge Base / Editor</span>
+					<h2 class="text-xl font-bold text-white tracking-tight">
+						if isNew {
+							<span>Create Note</span>
+						} else {
+							<span>{ noteDetails.Note.Title }</span>
+						}
+					</h2>
+				</div>
+			</div>
+
+			<!-- Telemetry & Actions -->
+			<div class="flex items-center gap-4">
+				<div class="flex items-center gap-3 text-xs text-slate-400 font-mono-code bg-slate-900/60 px-4 py-2 rounded-xl border border-slate-800">
+					<span class="flex items-center gap-1">
+						<i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-400"></i>
+						<span x-text="wordCount + ' words'"></span>
+					</span>
+					<span class="flex items-center gap-1">
+						<i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-400"></i>
+						<span x-text="readingTime"></span>
+					</span>
+					if !isNew {
+						<span id="autosave-status" class="text-slate-500 font-mono-code ml-2" x-text="autosaveStatus"></span>
+					}
+				</div>
+
+				if !isNew {
+					<form action={ templ.URL(fmt.Sprintf("/notes/%d/pin", noteDetails.Note.ID)) } method="POST">
+						<button type="submit" title="Toggle Pin" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 transition-all border border-slate-700">
+							<i data-lucide="pin" class="w-4 h-4"></i>
+						</button>
+					</form>
+				}
+			</div>
+		</div>
+
+		<!-- Main Form Layout -->
+		<form action={ getFormAction(noteDetails.Note.ID, isNew) } method="POST" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+			<!-- Left 2-Cols: Markdown Editor -->
+			<div class="lg:col-span-2 space-y-4">
+				<!-- Formatting Toolbar -->
+				<div class="flex items-center gap-1 p-2 rounded-2xl bg-slate-900 border border-slate-800 overflow-x-auto">
+					<button @click="insertFormatting('bold')" type="button" title="Bold" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+						<i data-lucide="bold" class="w-4 h-4"></i>
+					</button>
+					<button @click="insertFormatting('italic')" type="button" title="Italic" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+						<i data-lucide="italic" class="w-4 h-4"></i>
+					</button>
+					<button @click="insertFormatting('heading')" type="button" title="Heading" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+						<i data-lucide="heading" class="w-4 h-4"></i>
+					</button>
+					<button @click="insertFormatting('code')" type="button" title="Code Block" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+						<i data-lucide="code" class="w-4 h-4"></i>
+					</button>
+					<button @click="insertFormatting('quote')" type="button" title="Quote" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+						<i data-lucide="quote" class="w-4 h-4"></i>
+					</button>
+					<div class="w-px h-5 bg-slate-800 mx-1"></div>
+					<button @click="insertFormatting('wikilink')" type="button" title="Insert [[Wiki Link]]" class="px-3 py-1 rounded-lg text-xs font-mono-code font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-all flex items-center gap-1">
+						<i data-lucide="link" class="w-3.5 h-3.5"></i>
+						<span>[[Wiki Link]]</span>
+					</button>
+				</div>
+
+				<div class="glass-panel p-6 rounded-3xl space-y-4">
+					<div>
+						<label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Title</label>
+						<input id="note-title-input" type="text" name="title" x-model="title" required value={ noteDetails.Note.Title } placeholder="Note Title..." class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-800 text-white font-bold text-lg placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+					</div>
+
+					<div>
+						<label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Content (Markdown + [[Wiki Links]])</label>
+						<textarea id="note-content-textarea" name="content" x-model="content" @input="updateStats()" rows="18" placeholder="Write your markdown content... Use [[Note Title]] to link notes together." class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-800 text-white font-mono-code text-sm leading-relaxed placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">{ noteDetails.Note.Content }</textarea>
+					</div>
+				</div>
+
+				<div class="flex justify-end gap-3">
+					<a href="/notes" hx-boost="true" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-colors">Cancel</a>
+					<button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">Save Note</button>
+				</div>
+			</div>
+
+			<!-- Right Col: Metadata & Backlinks -->
+			<div class="space-y-6">
+				<!-- Metadata Card -->
+				<div class="glass-panel p-6 rounded-3xl space-y-5">
+					<h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
+						<i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i>
+						<span>Metadata</span>
+					</h3>
+
+					<div>
+						<label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Linked Project</label>
+						<select name="project_id" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-800 text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+							<option value="0">None (Standalone Note)</option>
+							for _, proj := range availableProjects {
+								<option value={ fmt.Sprintf("%d", proj.ID) } selected?={ noteDetails.Note.ProjectID.Valid && noteDetails.Note.ProjectID.Int64 == proj.ID }>{ proj.Name }</option>
+							}
+						</select>
+					</div>
+
+					<div>
+						<label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tags (comma-separated)</label>
+						<input type="text" name="tags" value={ strings.Join(noteDetails.Tags, ", ") } placeholder="architecture, go, ideas" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-800 text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+					</div>
+				</div>
+
+				<!-- Linked References (Backlinks) -->
+				if !isNew {
+					<div class="glass-panel p-6 rounded-3xl space-y-4">
+						<h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
+							<i data-lucide="link" class="w-4 h-4 text-emerald-400"></i>
+							<span>Linked References ({ fmt.Sprintf("%d", len(noteDetails.Backlinks)) })</span>
+						</h3>
+
+						if len(noteDetails.Backlinks) == 0 {
+							<p class="text-xs text-slate-500 leading-relaxed">
+								No incoming links to this note yet. Reference this note in another entry using <code class="text-indigo-400 font-mono-code">[[{ noteDetails.Note.Title }]]</code>.
+							</p>
+						} else {
+							<div class="space-y-3">
+								for _, backlink := range noteDetails.Backlinks {
+									<a href={ templ.URL(fmt.Sprintf("/notes/%d", backlink.ID)) } hx-boost="true" class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all block space-y-1 group">
+										<h4 class="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors leading-snug">{ backlink.Title }</h4>
+										<p class="text-[11px] text-slate-400 line-clamp-2">{ truncateContent(backlink.Content, 80) }</p>
+									</a>
+								}
+							</div>
+						}
+					</div>
+				}
+			</div>
+		</form>
+	</div>
+}
+
+func getFormAction(id int64, isNew bool) string {
+	if isNew {
+		return "/notes"
+	}
+	return fmt.Sprintf("/notes/%d/edit", id)
+}

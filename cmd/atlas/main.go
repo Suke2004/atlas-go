@@ -23,6 +23,7 @@ import (
 	"github.com/Suke2004/atlas-go/internal/db"
 	"github.com/Suke2004/atlas-go/internal/health"
 	"github.com/Suke2004/atlas-go/internal/logger"
+	"github.com/Suke2004/atlas-go/internal/notes"
 	"github.com/Suke2004/atlas-go/internal/projects"
 	"github.com/Suke2004/atlas-go/internal/setup"
 	"github.com/Suke2004/atlas-go/internal/tasks"
@@ -87,6 +88,10 @@ func main() {
 	tasksRepo := tasks.NewRepository(database)
 	tasksSvc := tasks.NewService(tasksRepo, projectsRepo, projectsSvc)
 	tasksHandler := tasks.NewHandler(tasksSvc, projectsRepo, log)
+
+	notesRepo := notes.NewRepository(database)
+	notesSvc := notes.NewService(notesRepo, projectsRepo)
+	notesHandler := notes.NewHandler(notesSvc, projectsRepo, log)
 
 	// ── 6. Router ──────────────────────────────────────────────────────────
 	r := chi.NewRouter()
@@ -157,6 +162,16 @@ func main() {
 		protected.Post("/tasks", tasksHandler.Create)
 		protected.Post("/tasks/{id}/status", tasksHandler.UpdateStatus)
 		protected.Post("/tasks/{id}/delete", tasksHandler.Delete)
+
+		// Knowledge Base (Notes) Module Routes
+		protected.Get("/notes", notesHandler.List)
+		protected.Get("/notes/new", notesHandler.NewForm)
+		protected.Post("/notes", notesHandler.Create)
+		protected.Get("/notes/{id}", notesHandler.Detail)
+		protected.Post("/notes/{id}/edit", notesHandler.Update)
+		protected.Post("/notes/{id}/autosave", notesHandler.Autosave)
+		protected.Post("/notes/{id}/pin", notesHandler.TogglePin)
+		protected.Post("/notes/{id}/delete", notesHandler.Delete)
 	})
 
 	// ── 7. Server ──────────────────────────────────────────────────────────

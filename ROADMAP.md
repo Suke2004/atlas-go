@@ -10,9 +10,9 @@
 | Release | Status |
 |---------|--------|
 | v0.1.0 — Foundation | ✅ Shipped (2026-07-26) |
-| v0.2.0 — Projects + Tasks | ⬜ Planned |
-| v0.3.0 — Knowledge + Journal + Search | ⬜ Planned |
-| v0.4.0 — Dashboard + Settings | ⬜ Planned |
+| v0.2.0 — Projects + Tasks | ✅ Shipped (2026-07-26) |
+| v0.3.0 — Knowledge Base + Command Center | ✅ Shipped (2026-07-26) |
+| v0.4.0 — Journal + Global Search | ⬜ Planned |
 | v0.5.0 — AI + Finance + Learning | ⬜ Planned |
 | v1.0.0 — Stable | ⬜ Planned |
 
@@ -37,6 +37,17 @@
 - [x] Task dependencies, priority, energy levels
 - [x] Task → Project linking + progress auto-calculation
 - [x] Linear/Vercel-inspired Slate Obsidian theme with zero emojis & Lucide SVG icons
+
+---
+
+## v0.3.0 — Knowledge Base + Command Center *(Shipped 2026-07-26)*
+
+- [x] Knowledge Base: Markdown Editor with Live Preview
+- [x] Note Template Library (ADR, Meeting Notes, Brainstorming)
+- [x] One-Click Formatting Toolbar
+- [x] Wiki-style internal links `[[Note Title]]` + Bidirectional Backlinks
+- [x] Reading time & word count telemetry + 30s background autosave
+- [x] Executive Command Center root `/` dashboard with active initiative progress bars
 
 ---
 
