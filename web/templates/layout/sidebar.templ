@@ -51,7 +51,22 @@ templ Sidebar(currentPath string, username string) {
 				<span>Daily Journal</span>
 			</a>
 
-			<div class="pt-6">
+			<div class="pt-4">
+				<div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Intelligence</div>
+				<a href="/documents" hx-boost="true" class={ navClass(currentPath == "/documents") }>
+					<i data-lucide="library" class="w-4 h-4"></i>
+					<span>Documents</span>
+				</a>
+				<a href="/finance" hx-boost="true" class={ navClass(currentPath == "/finance") }>
+					<i data-lucide="wallet" class="w-4 h-4"></i>
+					<span>Finance</span>
+				</a>
+				<a href="/learning" hx-boost="true" class={ navClass(currentPath == "/learning") }>
+					<i data-lucide="graduation-cap" class="w-4 h-4"></i>
+					<span>Learning</span>
+				</a>
+			</div>
+			<div class="pt-4">
 				<div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">System</div>
 				<a href="/settings" hx-boost="true" class={ navClass(currentPath == "/settings") }>
 					<i data-lucide="settings" class="w-4 h-4"></i>

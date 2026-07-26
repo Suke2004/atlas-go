@@ -14,6 +14,7 @@
 | v0.3.0 — Knowledge Base | ✅ Shipped (2026-07-26) |
 | v0.4.0 — Executive Mind-Sync Journal + Global Search | ✅ Shipped (2026-07-26) |
 | v0.5.0 — Finance Engine + Tech Skill Roadmap | ✅ Shipped (2026-07-26) |
+| v0.6.0 — Documents Engine & AI Provider Switching | ✅ Shipped (2026-07-26) |
 | v1.0.0 — Stable | ⬜ Planned |
 
 ---
@@ -51,39 +52,13 @@
 
 ---
 
-## v0.3.0 — Knowledge + Journal + Search
+## v0.6.0 — Documents Engine & AI Provider Switching *(Shipped 2026-07-26)*
 
-- [ ] Knowledge Base: Markdown editor, live preview, 30s autosave
-- [ ] Note tagging and bidirectional linking
-- [ ] Journal: daily entries, mood/energy/sleep, on-blur save
-- [ ] Global search (Ctrl+K, SQLite FTS5)
-
----
-
-## v0.4.0 — Dashboard + Settings
-
-- [ ] Dashboard: live widgets (Focus, Projects, Journal reminder, Quote)
-- [ ] Settings: theme toggle, widget visibility
-- [ ] Skeleton loaders, empty states, toast notifications
-- [ ] Polish: HTMX indicators, responsive layout
-
----
-
-## v0.5.0 — AI + Finance + Learning
-
-- [ ] AI Workspace: provider interface (OpenAI + Ollama)
-- [ ] Chat, PDF Q&A, "Ask Atlas" (NL queries over personal data)
-- [ ] Finance: manual income/expense, budgets, charts
-- [ ] Learning Tracker: tracks, streaks, session logging
-
----
-
-## v0.6.0 — Documents
-
-- [ ] File upload (PDF, images, text)
-- [ ] In-browser PDF preview
-- [ ] AI-generated document summaries
-- [ ] Full-text search of document contents
+- [x] Documents: Upload, file storage in `/data/uploads`, inline preview for PDF, images, text
+- [x] Document metadata editing (title, JSON tags) & FTS5 full-text search indexing
+- [x] AI Provider Switching: Hot-swappable interface between local Ollama and Google Gemini
+- [x] AI Document Summarisation endpoint using active AI Provider backend
+- [x] System Settings: Theme options, AI provider configuration, and credentials management
 
 ---
 

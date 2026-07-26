@@ -162,18 +162,18 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| queries/tasks.sql | ⬜ | CRUD + deps + labels + today focus |
-| internal/tasks/repository.go | ⬜ | |
-| internal/tasks/service.go | ⬜ | Dep validation on status change |
-| internal/tasks/handler.go | ⬜ | All routes incl. /status |
-| 	emplates/tasks/list.templ | ⬜ | Table + filters |
-| 	emplates/tasks/kanban.templ | ⬜ | Three-column board |
-| 	emplates/tasks/form.templ | ⬜ | Full task form |
-| 	emplates/tasks/deps.templ | ⬜ | Dependency list partial |
-| static/js/kanban.js | ⬜ | Alpine.js drag + hx-put |
-| Task updates → project progress recalc | ⬜ | |
-| Overdue tasks highlighted | ⬜ | |
-| Tasks CRUD integration test | ⬜ | |
+| queries/tasks.sql | ✅ | CRUD + deps + labels + today focus |
+| internal/tasks/repository.go | ✅ | |
+| internal/tasks/service.go | ✅ | Dep validation on status change |
+| internal/tasks/handler.go | ✅ | All routes incl. /status |
+| templates/tasks/list.templ | ✅ | Table + filters |
+| templates/tasks/kanban.templ | ✅ | Three-column board |
+| templates/tasks/form.templ | ✅ | Full task form |
+| templates/tasks/deps.templ | ✅ | Dependency list partial |
+| static/js/kanban.js | ✅ | Alpine.js drag + hx-put |
+| Task updates → project progress recalc | ✅ | |
+| Overdue tasks highlighted | ✅ | |
+| Tasks CRUD integration test | ✅ | |
 
 ---
 
@@ -341,11 +341,11 @@ Only after every box is checked is the milestone truly complete.
 | 3 — Layout Shell | [docs/retros/phase-3.md](docs/retros/phase-3.md) | ✅ Written |
 | 4 — Projects | [docs/retros/phase-4.md](docs/retros/phase-4.md) | ✅ Written |
 | 5 — Tasks | [docs/retros/phase-5.md](docs/retros/phase-5.md) | ✅ Written |
-| 6 — Knowledge Base | [docs/retros/phase-6.md](docs/retros/phase-6.md) | ⬜ Not written |
-| 7 — Dashboard | [docs/retros/phase-7.md](docs/retros/phase-7.md) | ⬜ Not written |
-| 8 — Journal | [docs/retros/phase-8.md](docs/retros/phase-8.md) | ⬜ Not written |
-| 9 — Search | [docs/retros/phase-9.md](docs/retros/phase-9.md) | ⬜ Not written |
-| 10 — Settings | [docs/retros/phase-10.md](docs/retros/phase-10.md) | ⬜ Not written |
+| 6 — Knowledge Base | [docs/retros/phase-6.md](docs/retros/phase-6.md) | ✅ Written |
+| 7 — Dashboard | [docs/retros/phase-7.md](docs/retros/phase-7.md) | ✅ Written |
+| 8 — Journal | [docs/retros/phase-8-9.md](docs/retros/phase-8-9.md) | ✅ Written |
+| 9 — Search | [docs/retros/phase-9.md](docs/retros/phase-9.md) | ✅ Written |
+| 10 — Settings | [docs/retros/phase-10.md](docs/retros/phase-10.md) | ✅ Written |
 
 ---
 

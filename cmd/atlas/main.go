@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -20,9 +21,11 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
 
+	"github.com/Suke2004/atlas-go/internal/ai"
 	"github.com/Suke2004/atlas-go/internal/auth"
 	"github.com/Suke2004/atlas-go/internal/config"
 	"github.com/Suke2004/atlas-go/internal/db"
+	"github.com/Suke2004/atlas-go/internal/documents"
 	"github.com/Suke2004/atlas-go/internal/finance"
 	"github.com/Suke2004/atlas-go/internal/health"
 	"github.com/Suke2004/atlas-go/internal/journal"
@@ -31,6 +34,7 @@ import (
 	"github.com/Suke2004/atlas-go/internal/notes"
 	"github.com/Suke2004/atlas-go/internal/projects"
 	"github.com/Suke2004/atlas-go/internal/search"
+	"github.com/Suke2004/atlas-go/internal/settings"
 	"github.com/Suke2004/atlas-go/internal/setup"
 	"github.com/Suke2004/atlas-go/internal/tasks"
 	dashtemplates "github.com/Suke2004/atlas-go/web/templates/dashboard"
@@ -113,6 +117,19 @@ func main() {
 	learningRepo := learning.NewRepository(database)
 	learningSvc := learning.NewService(learningRepo)
 	learningHandler := learning.NewHandler(learningSvc, log)
+
+	// Settings service — used to build AI provider
+	settingsSvc := settings.NewService(database)
+	settingsHandler := settings.NewHandler(settingsSvc, log)
+
+	// AI provider — constructed from user settings (default: Ollama)
+	allSettings := settingsSvc.GetAll(context.Background(), 1) // single-user: ID 1
+	aiProvider := ai.NewFromSettings(allSettings)
+
+	// Documents module
+	docsRepo := documents.NewRepository(database)
+	docsSvc := documents.NewService(docsRepo, aiProvider)
+	docsHandler := documents.NewHandler(docsSvc, log)
 
 	// ── 6. Router ──────────────────────────────────────────────────────────
 	r := chi.NewRouter()
@@ -215,6 +232,20 @@ func main() {
 		protected.Post("/learning/tracks", learningHandler.CreateTrack)
 		protected.Post("/learning/sessions", learningHandler.AddSession)
 		protected.Post("/learning/tracks/{id}/delete", learningHandler.DeleteTrack)
+
+		// Documents Module Routes
+		protected.Get("/documents", docsHandler.List)
+		protected.Post("/documents", docsHandler.Upload)
+		protected.Get("/documents/{id}", docsHandler.Detail)
+		protected.Get("/documents/{id}/raw", docsHandler.ServeRaw)
+		protected.Get("/documents/{id}/download", docsHandler.Download)
+		protected.Post("/documents/{id}/meta", docsHandler.UpdateMeta)
+		protected.Post("/documents/{id}/summarise", docsHandler.Summarise)
+		protected.Post("/documents/{id}/delete", docsHandler.Delete)
+
+		// Settings Routes
+		protected.Get("/settings", settingsHandler.Index)
+		protected.Post("/settings", settingsHandler.Save)
 	})
 
 	// ── 7. Server ──────────────────────────────────────────────────────────

@@ -179,3 +179,20 @@ type LearningSession struct {
 	SessionDate     string    `json:"session_date" db:"session_date"`
 	CreatedAt       time.Time `json:"created_at" db:"created_at"`
 }
+
+type Document struct {
+	ID           int64          `json:"id" db:"id"`
+	UserID       int64          `json:"user_id" db:"user_id"`
+	Filename     string         `json:"filename" db:"filename"`
+	OriginalName string         `json:"original_name" db:"original_name"`
+	MimeType     string         `json:"mime_type" db:"mime_type"`
+	FileSize     int64          `json:"file_size" db:"file_size"`
+	StoragePath  string         `json:"storage_path" db:"storage_path"`
+	Title        string         `json:"title" db:"title"`
+	Summary      sql.NullString `json:"summary" db:"summary"`
+	ContentText  sql.NullString `json:"content_text" db:"content_text"`
+	Tags         string         `json:"tags" db:"tags"`
+	CreatedAt    time.Time      `json:"created_at" db:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at" db:"updated_at"`
+}
+

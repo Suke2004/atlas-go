@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.6.0] - 2026-07-26
+
+### Added
+- **Documents Engine Module (`/documents`)**:
+  - File upload engine with support for all file types, saving to `/data/uploads/`.
+  - In-browser inline previews for PDF files, images, and plain text code/documents.
+  - Document metadata editor (title, comma-separated tags) and download endpoint.
+  - Automatic FTS5 search indexing across document names and text content.
+- **AI Provider Engine & Settings (`/settings`)**:
+  - Hot-swappable AI provider architecture supporting **Google Gemini** (Gemini 2.0 Flash / Pro) and local **Ollama** (Llama 3.2).
+  - One-click AI document summarisation endpoint.
+  - Full system settings panel for appearance theme selection and API credential configuration.
+
+---
+
 ## [v0.5.0] - 2026-07-26
 
 ### Added

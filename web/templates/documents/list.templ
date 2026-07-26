@@ -1,0 +1,134 @@
+package documents
+
+import (
+	"fmt"
+)
+
+templ List(docs []DocumentWithMeta, total int64, errorMsg string) {
+	<div
+		class="space-y-8"
+		x-data="{
+			dragging: false,
+			async handleDrop(e) {
+				e.preventDefault();
+				this.dragging = false;
+				const files = e.dataTransfer.files;
+				if (files.length === 0) return;
+				const form = document.getElementById('upload-form');
+				const dt = new DataTransfer();
+				dt.items.add(files[0]);
+				form.querySelector('input[type=file]').files = dt.files;
+				form.submit();
+			}
+		}"
+		@dragover.prevent="dragging = true"
+		@dragleave="dragging = false"
+		@drop="handleDrop($event)"
+	>
+		<!-- Page Header -->
+		<div class="p-6 md:p-8 rounded-3xl glass-panel relative overflow-hidden">
+			<div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+				<div>
+					<div class="flex items-center gap-3 mb-2">
+						<span class="px-3 py-1 rounded-full badge-tech text-xs uppercase tracking-widest flex items-center gap-1.5 font-mono-code">
+							<i data-lucide="library" class="w-3.5 h-3.5 text-cyan-400"></i>
+							Document Library
+						</span>
+						<span class="text-xs text-slate-500 font-mono-code hidden sm:inline-block">{ fmt.Sprintf("%d files", total) }</span>
+					</div>
+					<h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Documents</h1>
+					<p class="text-slate-400 text-sm mt-1.5 max-w-xl leading-relaxed">
+						Upload, preview, and AI-summarise any file. Drag &amp; drop anywhere on the page to upload instantly.
+					</p>
+				</div>
+				<!-- Upload trigger -->
+				<label for="file-upload-input" class="cursor-pointer px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-xl shadow-indigo-500/20 flex items-center gap-2.5 transition-all duration-200 hover:-translate-y-0.5">
+					<i data-lucide="upload-cloud" class="w-4 h-4"></i>
+					Upload File
+				</label>
+			</div>
+		</div>
+
+		<!-- Error banner -->
+		if errorMsg != "" {
+			<div class="flex items-center gap-3 px-5 py-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm">
+				<i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+				{ errorMsg }
+			</div>
+		}
+
+		<!-- Hidden upload form -->
+		<form id="upload-form" method="POST" action="/documents" enctype="multipart/form-data" class="hidden">
+			<input id="file-upload-input" type="file" name="file" onchange="document.getElementById('upload-form').submit()" class="hidden" accept="*/*"/>
+		</form>
+
+		<!-- Drag overlay -->
+		<div
+			x-show="dragging"
+			x-transition
+			class="fixed inset-0 z-50 flex items-center justify-center bg-indigo-950/80 backdrop-blur-sm pointer-events-none"
+		>
+			<div class="text-center">
+				<i data-lucide="upload-cloud" class="w-16 h-16 text-indigo-400 mx-auto mb-4 animate-bounce"></i>
+				<p class="text-2xl font-bold text-white">Drop to upload</p>
+			</div>
+		</div>
+
+		if len(docs) == 0 {
+			<!-- Empty state -->
+			<div class="flex flex-col items-center justify-center py-24 text-center">
+				<div class="w-20 h-20 rounded-3xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center mb-6">
+					<i data-lucide="library" class="w-10 h-10 text-slate-500"></i>
+				</div>
+				<h3 class="text-xl font-bold text-white mb-2">No documents yet</h3>
+				<p class="text-slate-400 text-sm max-w-sm mb-8">
+					Drag and drop any file onto this page, or click "Upload File" to add your first document.
+				</p>
+				<label for="file-upload-input" class="cursor-pointer px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm flex items-center gap-2">
+					<i data-lucide="upload-cloud" class="w-4 h-4"></i>
+					Upload First File
+				</label>
+			</div>
+		} else {
+			<!-- Document grid -->
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+				for _, doc := range docs {
+					@DocumentCard(doc)
+				}
+			</div>
+		}
+	</div>
+}
+
+templ DocumentCard(doc DocumentWithMeta) {
+	<a
+		href={ templ.SafeURL(fmt.Sprintf("/documents/%d", doc.ID)) }
+		class="group flex flex-col p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 hover:bg-slate-800/60 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/5"
+	>
+		<!-- File icon -->
+		<div class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700/60 flex items-center justify-center mb-4 group-hover:bg-indigo-600/10 group-hover:border-indigo-500/30 transition-colors">
+			<i data-lucide={ doc.FileIcon } class="w-6 h-6 text-slate-400 group-hover:text-indigo-400 transition-colors"></i>
+		</div>
+
+		<!-- File name -->
+		<p class="text-sm font-semibold text-white truncate mb-1 group-hover:text-indigo-200 transition-colors">{ doc.Title }</p>
+		<p class="text-xs text-slate-500 truncate mb-3">{ doc.OriginalName }</p>
+
+		<!-- Meta row -->
+		<div class="mt-auto flex items-center justify-between">
+			<span class={ "text-[10px] px-2 py-0.5 rounded-full border font-mono-code " + previewBadgeClass(doc.PreviewType) }>
+				{ previewLabel(doc.PreviewType) }
+			</span>
+			<span class="text-xs text-slate-600 font-mono-code">{ doc.HumanSize }</span>
+		</div>
+
+		<!-- Tags -->
+		if len(doc.TagList) > 0 {
+			<div class="flex flex-wrap gap-1.5 mt-3">
+				for _, tag := range doc.TagList {
+					<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700/60 text-slate-400">{ tag }</span>
+				}
+			</div>
+		}
+	</a>
+}

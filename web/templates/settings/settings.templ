@@ -1,0 +1,197 @@
+package settings
+
+templ Settings(displayName string, username string, s map[string]string, savedMsg string) {
+	<div class="space-y-8 max-w-3xl">
+		<!-- Page Header -->
+		<div class="p-6 md:p-8 rounded-3xl glass-panel relative overflow-hidden">
+			<div class="relative z-10">
+				<div class="flex items-center gap-3 mb-2">
+					<span class="px-3 py-1 rounded-full badge-tech text-xs uppercase tracking-widest flex items-center gap-1.5 font-mono-code">
+						<i data-lucide="settings-2" class="w-3.5 h-3.5 text-cyan-400"></i>
+						Configuration
+					</span>
+				</div>
+				<h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Settings</h1>
+				<p class="text-slate-400 text-sm mt-1.5 max-w-xl leading-relaxed">
+					Personalise Atlas — theme, AI provider, and account preferences.
+				</p>
+			</div>
+		</div>
+
+		if savedMsg != "" {
+			<div class="flex items-center gap-3 px-5 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium">
+				<i data-lucide="check-circle" class="w-4 h-4"></i>
+				Settings saved successfully.
+			</div>
+		}
+
+		<form method="POST" action="/settings" class="space-y-6">
+			<!-- Theme Section -->
+			<div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-4">
+				<h2 class="text-base font-bold text-white flex items-center gap-2">
+					<i data-lucide="sun-moon" class="w-4 h-4 text-indigo-400"></i>
+					Appearance
+				</h2>
+				<div>
+					<label class="text-sm text-slate-400 mb-3 block">Theme</label>
+					<div class="flex gap-3">
+						for _, opt := range [][]string{{"light", "Light"}, {"dark", "Dark"}, {"system", "System"}} {
+							<label class="flex-1 cursor-pointer">
+								<input
+									type="radio"
+									name="theme"
+									value={ opt[0] }
+									class="sr-only peer"
+									if s["theme"] == opt[0] {
+										checked
+									}
+								/>
+								<div class="px-4 py-3 rounded-xl border border-slate-700/60 text-center text-sm font-medium text-slate-400 peer-checked:bg-indigo-600/20 peer-checked:border-indigo-500/60 peer-checked:text-indigo-300 transition-all duration-150 hover:border-slate-600">
+									{ opt[1] }
+								</div>
+							</label>
+						}
+					</div>
+				</div>
+			</div>
+
+			<!-- AI Provider Section -->
+			<div
+				class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-6"
+				x-data={ `{ provider: '` + s["ai_provider"] + `' }` }
+			>
+				<h2 class="text-base font-bold text-white flex items-center gap-2">
+					<i data-lucide="cpu" class="w-4 h-4 text-violet-400"></i>
+					AI Provider
+				</h2>
+
+				<!-- Provider Toggle -->
+				<div>
+					<label class="text-sm text-slate-400 mb-3 block">Active Backend</label>
+					<div class="flex gap-3">
+						<label class="flex-1 cursor-pointer">
+							<input type="radio" name="ai_provider" value="gemini" class="sr-only peer" @change="provider = 'gemini'"
+								if s["ai_provider"] == "gemini" {
+									checked
+								}
+							/>
+							<div class="px-4 py-3 rounded-xl border border-slate-700/60 text-center text-sm font-medium text-slate-400 peer-checked:bg-violet-600/20 peer-checked:border-violet-500/60 peer-checked:text-violet-300 transition-all duration-150 hover:border-slate-600 flex items-center justify-center gap-2">
+								<i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+								Google Gemini
+							</div>
+						</label>
+						<label class="flex-1 cursor-pointer">
+							<input type="radio" name="ai_provider" value="ollama" class="sr-only peer" @change="provider = 'ollama'"
+								if s["ai_provider"] == "ollama" || s["ai_provider"] == "" {
+									checked
+								}
+							/>
+							<div class="px-4 py-3 rounded-xl border border-slate-700/60 text-center text-sm font-medium text-slate-400 peer-checked:bg-orange-600/20 peer-checked:border-orange-500/60 peer-checked:text-orange-300 transition-all duration-150 hover:border-slate-600 flex items-center justify-center gap-2">
+								<i data-lucide="server" class="w-3.5 h-3.5"></i>
+								Ollama (Local)
+							</div>
+						</label>
+					</div>
+				</div>
+
+				<!-- Gemini Settings -->
+				<div x-show="provider === 'gemini'" x-transition class="space-y-4">
+					<div class="p-4 rounded-xl bg-violet-500/5 border border-violet-500/20 text-xs text-violet-300 flex items-start gap-2">
+						<i data-lucide="info" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0"></i>
+						<span>Gemini API calls are billed to your Google account. Your key is stored locally and never leaves your machine.</span>
+					</div>
+					<div class="space-y-1">
+						<label for="ai_gemini_key" class="text-sm text-slate-400">Gemini API Key</label>
+						<input
+							id="ai_gemini_key"
+							type="password"
+							name="ai_gemini_key"
+							value={ s["ai_gemini_key"] }
+							placeholder="AIza..."
+							class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700/60 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/20 font-mono-code"
+						/>
+					</div>
+					<div class="space-y-1">
+						<label for="ai_gemini_model" class="text-sm text-slate-400">Gemini Model</label>
+						<select
+							id="ai_gemini_model"
+							name="ai_gemini_model"
+							class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700/60 text-sm text-white focus:outline-none focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/20"
+						>
+							for _, m := range [][]string{
+								{"gemini-2.0-flash", "Gemini 2.0 Flash (Recommended)"},
+								{"gemini-2.0-flash-lite", "Gemini 2.0 Flash-Lite (Fast)"},
+								{"gemini-1.5-pro", "Gemini 1.5 Pro (Powerful)"},
+								{"gemini-1.5-flash", "Gemini 1.5 Flash"},
+							} {
+								<option value={ m[0] } selected?={ s["ai_gemini_model"] == m[0] }>{ m[1] }</option>
+							}
+						</select>
+					</div>
+				</div>
+
+				<!-- Ollama Settings -->
+				<div x-show="provider === 'ollama'" x-transition class="space-y-4">
+					<div class="p-4 rounded-xl bg-orange-500/5 border border-orange-500/20 text-xs text-orange-300 flex items-start gap-2">
+						<i data-lucide="info" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0"></i>
+						<span>Ollama runs entirely on your machine. No data leaves your device. Make sure Ollama is running and the model is pulled.</span>
+					</div>
+					<div class="grid grid-cols-2 gap-4">
+						<div class="space-y-1">
+							<label for="ai_ollama_url" class="text-sm text-slate-400">Ollama URL</label>
+							<input
+								id="ai_ollama_url"
+								type="text"
+								name="ai_ollama_url"
+								value={ s["ai_ollama_url"] }
+								placeholder="http://localhost:11434"
+								class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700/60 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/60 focus:ring-1 focus:ring-orange-500/20 font-mono-code"
+							/>
+						</div>
+						<div class="space-y-1">
+							<label for="ai_ollama_model" class="text-sm text-slate-400">Model Name</label>
+							<input
+								id="ai_ollama_model"
+								type="text"
+								name="ai_ollama_model"
+								value={ s["ai_ollama_model"] }
+								placeholder="llama3.2"
+								class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700/60 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/60 focus:ring-1 focus:ring-orange-500/20 font-mono-code"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Account Section -->
+			<div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-4">
+				<h2 class="text-base font-bold text-white flex items-center gap-2">
+					<i data-lucide="user-circle" class="w-4 h-4 text-slate-400"></i>
+					Account
+				</h2>
+				<div class="grid grid-cols-2 gap-4">
+					<div class="space-y-1">
+						<label class="text-sm text-slate-400">Display Name</label>
+						<div class="px-4 py-3 rounded-xl bg-slate-800/40 border border-slate-700/40 text-sm text-slate-300 font-medium">{ displayName }</div>
+					</div>
+					<div class="space-y-1">
+						<label class="text-sm text-slate-400">Username</label>
+						<div class="px-4 py-3 rounded-xl bg-slate-800/40 border border-slate-700/40 text-sm text-slate-300 font-mono-code">{ username }</div>
+					</div>
+				</div>
+				<p class="text-xs text-slate-600">Account details are set during the initial setup wizard and cannot be changed here.</p>
+			</div>
+
+			<!-- Save Button -->
+			<div class="flex justify-end">
+				<button
+					type="submit"
+					class="px-8 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-xl shadow-indigo-500/20 flex items-center gap-2.5 transition-all duration-200 hover:-translate-y-0.5"
+				>
+					<i data-lucide="save" class="w-4 h-4"></i>
+					Save Settings
+				</button>
+			</div>
+		</form>
+	</div>
+}
