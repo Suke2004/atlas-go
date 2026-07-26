@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Suke2004/atlas-go/internal/db"
+	projecttemplates "github.com/Suke2004/atlas-go/web/templates/projects"
 )
 
 type ProjectInput struct {
@@ -24,10 +25,13 @@ type ProjectWithMilestones struct {
 	Milestones []db.Milestone `json:"milestones"`
 }
 
+type ProjectsSummary = projecttemplates.ProjectsSummary
+
 type Service interface {
 	CreateProject(ctx context.Context, userID int64, input ProjectInput) (db.Project, error)
 	GetProject(ctx context.Context, userID, projectID int64) (*ProjectWithMilestones, error)
-	ListProjects(ctx context.Context, userID int64, statusFilter string) ([]db.Project, error)
+	ListProjects(ctx context.Context, userID int64, statusFilter string, tagFilter string, searchQuery string) ([]db.Project, error)
+	GetProjectsSummary(ctx context.Context, userID int64) (ProjectsSummary, error)
 	UpdateProject(ctx context.Context, userID, projectID int64, input ProjectInput) (db.Project, error)
 	DeleteProject(ctx context.Context, userID, projectID int64) error
 	SyncGitHubStats(ctx context.Context, userID, projectID int64) (db.Project, error)
@@ -131,23 +135,107 @@ func (s *service) GetProject(ctx context.Context, userID, projectID int64) (*Pro
 	}, nil
 }
 
-func (s *service) ListProjects(ctx context.Context, userID int64, statusFilter string) ([]db.Project, error) {
+func (s *service) ListProjects(ctx context.Context, userID int64, statusFilter string, tagFilter string, searchQuery string) ([]db.Project, error) {
 	allProjects, err := s.repo.ListProjects(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	if statusFilter == "" || statusFilter == "all" {
-		return allProjects, nil
+	var filtered []db.Project
+	tagLower := strings.ToLower(strings.TrimSpace(tagFilter))
+	searchLower := strings.ToLower(strings.TrimSpace(searchQuery))
+
+	for _, p := range allProjects {
+		// 1. Status Filter
+		if statusFilter != "" && statusFilter != "all" && !strings.EqualFold(p.Status, statusFilter) {
+			continue
+		}
+
+		// 2. Tag Filter
+		if tagLower != "" {
+			matchedTag := false
+			for _, tag := range strings.Split(p.TechStack, ",") {
+				if strings.TrimSpace(strings.ToLower(tag)) == tagLower {
+					matchedTag = true
+					break
+				}
+			}
+			if !matchedTag {
+				continue
+			}
+		}
+
+		// 3. Search Query
+		if searchLower != "" {
+			nameMatch := strings.Contains(strings.ToLower(p.Name), searchLower)
+			descMatch := strings.Contains(strings.ToLower(p.Description), searchLower)
+			repoMatch := strings.Contains(strings.ToLower(p.GithubUrl), searchLower)
+			if !nameMatch && !descMatch && !repoMatch {
+				continue
+			}
+		}
+
+		filtered = append(filtered, p)
 	}
 
-	var filtered []db.Project
+	return filtered, nil
+}
+
+func (s *service) GetProjectsSummary(ctx context.Context, userID int64) (ProjectsSummary, error) {
+	allProjects, err := s.repo.ListProjects(ctx, userID)
+	if err != nil {
+		return ProjectsSummary{}, err
+	}
+
+	var summary ProjectsSummary
+	summary.TotalProjects = int64(len(allProjects))
+	techMap := make(map[string]int)
+
 	for _, p := range allProjects {
-		if strings.EqualFold(p.Status, statusFilter) {
-			filtered = append(filtered, p)
+		if strings.EqualFold(p.Status, "active") {
+			summary.ActiveProjects++
+		} else if strings.EqualFold(p.Status, "completed") {
+			summary.CompletedProjects++
+		}
+
+		summary.TotalStars += p.GithubStars
+		summary.TotalForks += p.GithubForks
+
+		// Milestones
+		milestones, err := s.repo.ListMilestonesByProject(ctx, p.ID)
+		if err == nil {
+			summary.TotalMilestones += int64(len(milestones))
+			for _, m := range milestones {
+				if m.IsCompleted {
+					summary.CompletedMilestones++
+				}
+			}
+		}
+
+		// Tech Stack breakdown
+		if p.TechStack != "" {
+			for _, tag := range strings.Split(p.TechStack, ",") {
+				t := strings.TrimSpace(tag)
+				if t != "" {
+					techMap[t]++
+				}
+			}
 		}
 	}
-	return filtered, nil
+
+	if summary.TotalMilestones > 0 {
+		summary.MilestoneCompletionRate = (summary.CompletedMilestones * 100) / summary.TotalMilestones
+	}
+
+	// Extract top tech stack tags
+	for tag := range techMap {
+		summary.TopTechStack = append(summary.TopTechStack, tag)
+		if len(summary.TopTechStack) >= 6 {
+			break
+		}
+	}
+
+	return summary, nil
 }
 
 func (s *service) UpdateProject(ctx context.Context, userID, projectID int64, input ProjectInput) (db.Project, error) {

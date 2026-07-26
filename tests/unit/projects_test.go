@@ -102,4 +102,24 @@ func TestProjects_RecalculateProgress(t *testing.T) {
 	if updated.Project.ProgressPercentage != 25 {
 		t.Errorf("expected progress percentage to be 25%%, got: %d%%", updated.Project.ProgressPercentage)
 	}
+
+	// 5. Test GetProjectsSummary and tag filtering
+	summary, err := svc.GetProjectsSummary(ctx, user.ID)
+	if err != nil {
+		t.Fatalf("failed to get projects summary: %v", err)
+	}
+
+	if summary.TotalProjects != 1 || summary.ActiveProjects != 1 {
+		t.Errorf("expected 1 total & active project, got total: %d, active: %d", summary.TotalProjects, summary.ActiveProjects)
+	}
+
+	filteredGo, err := svc.ListProjects(ctx, user.ID, "all", "Go", "")
+	if err != nil || len(filteredGo) != 1 {
+		t.Fatalf("expected 1 project matching tag 'Go', got: %v", filteredGo)
+	}
+
+	filteredRust, err := svc.ListProjects(ctx, user.ID, "all", "Rust", "")
+	if err != nil || len(filteredRust) != 0 {
+		t.Fatalf("expected 0 projects matching tag 'Rust', got: %v", filteredRust)
+	}
 }

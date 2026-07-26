@@ -39,23 +39,34 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	if statusFilter == "" {
 		statusFilter = "all"
 	}
+	tagFilter := r.URL.Query().Get("tag")
+	searchQuery := r.URL.Query().Get("search")
+	viewMode := r.URL.Query().Get("view")
+	if viewMode == "" {
+		viewMode = "grid"
+	}
 
-	projectList, err := h.service.ListProjects(r.Context(), user.ID, statusFilter)
+	projectList, err := h.service.ListProjects(r.Context(), user.ID, statusFilter, tagFilter, searchQuery)
 	if err != nil {
 		h.logger.Error("failed to list projects", zap.Error(err))
 		http.Error(w, "Failed to load projects", http.StatusInternalServerError)
 		return
 	}
 
+	summary, err := h.service.GetProjectsSummary(r.Context(), user.ID)
+	if err != nil {
+		h.logger.Warn("failed to calculate projects summary", zap.Error(err))
+	}
+
 	isHTMX := r.Header.Get("HX-Request") == "true"
-	if isHTMX && r.Header.Get("HX-Target") == "projects-grid" {
+	if isHTMX && r.Header.Get("HX-Target") == "projects-content" {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		_ = projecttemplates.ProjectGrid(projectList, statusFilter).Render(r.Context(), w)
+		_ = projecttemplates.ProjectContent(projectList, statusFilter, viewMode, tagFilter, searchQuery).Render(r.Context(), w)
 		return
 	}
 
 	pageContent := templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
-		return projecttemplates.List(projectList, statusFilter, "").Render(ctx, w)
+		return projecttemplates.List(projectList, summary, statusFilter, viewMode, tagFilter, searchQuery, "").Render(ctx, w)
 	})
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

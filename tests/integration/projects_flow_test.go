@@ -85,7 +85,7 @@ func TestIntegration_ProjectsFlow(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected GET /projects to return 200, got: %d", w.Code)
 	}
-	if !strings.Contains(w.Body.String(), "No projects found") {
+	if !strings.Contains(w.Body.String(), "No matching projects") {
 		t.Errorf("expected empty state message in response")
 	}
 
@@ -109,7 +109,7 @@ func TestIntegration_ProjectsFlow(t *testing.T) {
 	}
 
 	// 3. Verify project created in DB
-	list, err := projectsSvc.ListProjects(ctx, user.ID, "all")
+	list, err := projectsSvc.ListProjects(ctx, user.ID, "all", "", "")
 	if err != nil || len(list) != 1 {
 		t.Fatalf("expected 1 project in DB, got: %v", list)
 	}

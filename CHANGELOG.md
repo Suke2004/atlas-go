@@ -10,13 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Projects Module (`internal/projects`): Project CRUD operations, status filters (*All*, *Active*, *Completed*, *Archived*), and color accent pills.
-- GitHub Integration & Live Metrics: GitHub repository URL import, live stars (⭐), forks (🍴), open issues (🐛), primary language, and last pushed date tracking.
-- Tech Stack Breakdown & Badges: Automated GitHub languages API detection and custom tech stack badge tags.
-- GitHub Action Triggers: One-click HTMX stats sync (`POST /projects/{id}/sync-github`) and GitHub open issue import as project milestones (`POST /projects/{id}/import-issues`).
-- Milestone Checklist & Progress Engine: Interactive milestone checkboxes with automatic project completion percentage recalculation (`Completed / Total * 100`).
-- API Documentation update (`docs/api_docs.md`): Registered 10 new HTTP endpoints.
-- Projects unit and integration test suite (`tests/unit/projects_test.go` & `tests/integration/projects_flow_test.go`).
+- Projects Module — **Celestial Cartography Design System**: Deep Abyssal Navy palette (`#070e1b`), cartographic grid overlay, Outfit UI typography, Space Mono code/metrics font, and glassmorphic panels with cyan/amber neon glowing accents.
+- **Executive Hero Metrics Banner**: Active Initiatives count, Milestone Completion Ratio (`18/24 — 75%`), Total GitHub Stars, and Workspace Tech Stack Diversity.
+- **Multi-View Modes Switcher**: Toggle between 🎴 **Grid View**, 📋 **Compact Table Ledger View**, and 📅 **Roadmap Timeline View**.
+- **Interactive Tech Stack Filtering & Live Search**: Clickable tech stack badge pills (`#Go`, `#SQLite`, `#HTMX`, `#TailwindCSS`) and real-time live search query filtering.
+- **Slide-Over Drawer**: Smooth Alpine.js right slide-over drawer for creating and initializing new projects.
+- **GitHub Integration**: Repository URL import, cached stars/forks/open issues, one-click HTMX stats sync, and GitHub issue milestone importer.
+
 
 
 
