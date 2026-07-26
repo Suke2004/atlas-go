@@ -63,20 +63,20 @@ type Milestone struct {
 }
 
 type Task struct {
-	ID               int64         `json:"id" db:"id"`
-	UserID           int64         `json:"user_id" db:"user_id"`
-	ProjectID        sql.NullInt64 `json:"project_id" db:"project_id"`
-	Title            string        `json:"title" db:"title"`
-	Description      string        `json:"description" db:"description"`
-	Status           string        `json:"status" db:"status"`
-	Priority         string        `json:"priority" db:"priority"`
-	EnergyLevel      string        `json:"energy_level" db:"energy_level"`
-	DueDate          sql.NullTime  `json:"due_date" db:"due_date"`
-	EstimatedMinutes sql.NullInt64 `json:"estimated_minutes" db:"estimated_minutes"`
-	ActualMinutes    sql.NullInt64 `json:"actual_minutes" db:"actual_minutes"`
-	CompletedAt      sql.NullTime  `json:"completed_at" db:"completed_at"`
-	CreatedAt        time.Time     `json:"created_at" db:"created_at"`
-	UpdatedAt        time.Time     `json:"updated_at" db:"updated_at"`
+	ID               int64          `json:"id" db:"id"`
+	UserID           int64          `json:"user_id" db:"user_id"`
+	ProjectID        sql.NullInt64  `json:"project_id" db:"project_id"`
+	Title            string         `json:"title" db:"title"`
+	Description      string         `json:"description" db:"description"`
+	Status           string         `json:"status" db:"status"`
+	Priority         string         `json:"priority" db:"priority"`
+	EnergyLevel      string         `json:"energy_level" db:"energy_level"`
+	DueDate          sql.NullString `json:"due_date" db:"due_date"`
+	EstimatedMinutes sql.NullInt64  `json:"estimated_minutes" db:"estimated_minutes"`
+	ActualMinutes    sql.NullInt64  `json:"actual_minutes" db:"actual_minutes"`
+	CompletedAt      sql.NullString `json:"completed_at" db:"completed_at"`
+	CreatedAt        time.Time      `json:"created_at" db:"created_at"`
+	UpdatedAt        time.Time      `json:"updated_at" db:"updated_at"`
 }
 
 type TaskLabel struct {

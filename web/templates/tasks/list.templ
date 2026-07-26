@@ -1,0 +1,369 @@
+package tasks
+
+import (
+	"fmt"
+	"strings"
+	"github.com/Suke2004/atlas-go/internal/db"
+)
+
+templ List(taskList []TaskWithDetails, summary TasksSummary, availableProjects []db.Project, currentFilter string, priorityFilter string, energyFilter string, viewMode string, searchQuery string, errorMsg string) {
+	<div class="space-y-8" x-data="{ showDrawer: false }">
+		<!-- Tasks Summary Header -->
+		<div class="p-6 md:p-8 rounded-3xl glass-panel relative overflow-hidden">
+			<div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+				<div>
+					<div class="flex items-center gap-3 mb-2">
+						<span class="px-3 py-1 rounded-full badge-tech text-xs uppercase tracking-widest flex items-center gap-1.5 font-mono-code">
+							<i data-lucide="check-square" class="w-3.5 h-3.5 text-cyan-400"></i>
+							Action Engine
+						</span>
+					</div>
+					<h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Tasks & Deliverables</h1>
+					<p class="text-slate-400 text-sm mt-1.5 max-w-xl leading-relaxed">
+						Manage your daily tasks, track priority actions, and monitor milestone completion.
+					</p>
+				</div>
+
+				<div class="flex items-center gap-3">
+					<button @click="showDrawer = true" type="button" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-xl shadow-indigo-500/20 flex items-center gap-2.5 transition-all duration-200 hover:-translate-y-0.5">
+						<i data-lucide="plus" class="w-4 h-4"></i>
+						<span>Create Task</span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Executive Metrics Row -->
+			<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-slate-800/80">
+				<div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+					<div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+						<i data-lucide="list-todo" class="w-3.5 h-3.5 text-cyan-400"></i>
+						<span>Total Tasks</span>
+					</div>
+					<div class="text-2xl font-extrabold text-white font-mono-code">{ fmt.Sprintf("%d", summary.TotalTasks) }</div>
+				</div>
+
+				<div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+					<div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+						<i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>
+						<span>Today's Focus</span>
+					</div>
+					<div class="text-2xl font-extrabold text-amber-400 font-mono-code">{ fmt.Sprintf("%d", summary.TodayFocusTasks) }</div>
+				</div>
+
+				<div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+					<div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+						<i data-lucide="play-circle" class="w-3.5 h-3.5 text-indigo-400"></i>
+						<span>In Progress</span>
+					</div>
+					<div class="text-2xl font-extrabold text-indigo-400 font-mono-code">{ fmt.Sprintf("%d", summary.InProgressTasks) }</div>
+				</div>
+
+				<div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+					<div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+						<i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+						<span>Completion Rate</span>
+					</div>
+					<div class="text-2xl font-extrabold text-emerald-400 font-mono-code">{ fmt.Sprintf("%d%%", summary.CompletionRate) }</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Control Toolbar: Status Tabs, Search & View Switcher -->
+		<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 glass-panel p-4 rounded-2xl">
+			<!-- Status Filter Tabs -->
+			<div class="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
+				<a href="/tasks?status=all" hx-boost="true" class={ filterTabClass(currentFilter == "all" || currentFilter == "") }>
+					<span>All Tasks</span>
+					<span class="px-2 py-0.5 rounded-full bg-slate-800 text-[11px] text-slate-300 font-mono-code">{ fmt.Sprintf("%d", summary.TotalTasks) }</span>
+				</a>
+				<a href="/tasks?status=todo" hx-boost="true" class={ filterTabClass(currentFilter == "todo") }>
+					<span>To Do</span>
+					<span class="px-2 py-0.5 rounded-full bg-slate-800 text-[11px] text-slate-400 font-mono-code">{ fmt.Sprintf("%d", summary.TodoTasks) }</span>
+				</a>
+				<a href="/tasks?status=in_progress" hx-boost="true" class={ filterTabClass(currentFilter == "in_progress") }>
+					<span>In Progress</span>
+					<span class="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 text-[11px] font-mono-code">{ fmt.Sprintf("%d", summary.InProgressTasks) }</span>
+				</a>
+				<a href="/tasks?status=done" hx-boost="true" class={ filterTabClass(currentFilter == "done") }>
+					<span>Completed</span>
+					<span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] font-mono-code">{ fmt.Sprintf("%d", summary.DoneTasks) }</span>
+				</a>
+			</div>
+
+			<!-- Search & View Mode Buttons -->
+			<div class="flex items-center gap-3">
+				<!-- Live Search Form -->
+				<form action="/tasks" method="GET" hx-boost="true" class="relative min-w-[220px]">
+					<i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+					<input type="text" name="search" value={ searchQuery } placeholder="Search tasks..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+				</form>
+
+				<!-- View Mode Switcher -->
+				<div class="flex items-center p-1 rounded-xl bg-slate-900/80 border border-slate-800">
+					<a href={ templ.URL(fmt.Sprintf("/tasks?status=%s&view=list", currentFilter)) } hx-boost="true" title="List View" class={ viewButtonClass(viewMode == "list" || viewMode == "") }>
+						<i data-lucide="list" class="w-4 h-4"></i>
+					</a>
+					<a href={ templ.URL(fmt.Sprintf("/tasks?status=%s&view=kanban", currentFilter)) } hx-boost="true" title="Kanban Board View" class={ viewButtonClass(viewMode == "kanban") }>
+						<i data-lucide="kanban" class="w-4 h-4"></i>
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- Tasks Content Container -->
+		<div id="tasks-content">
+			@TaskContent(taskList, availableProjects, currentFilter, viewMode)
+		</div>
+
+		<!-- Slide-Over Drawer Form for Task Creation -->
+		<div x-show="showDrawer" x-transition.opacity class="fixed inset-0 z-50 flex justify-end bg-slate-950/80 backdrop-blur-md" style="display: none;">
+			<div @click.outside="showDrawer = false" class="w-full max-w-xl bg-slate-900 border-l border-slate-800 h-full p-8 overflow-y-auto space-y-6 shadow-2xl">
+				<div class="flex items-center justify-between border-b border-slate-800 pb-4">
+					<div>
+						<h3 class="text-2xl font-bold text-white tracking-tight">Create New Task</h3>
+						<p class="text-xs text-slate-400 mt-0.5">Add an actionable item to your workspace queue.</p>
+					</div>
+					<button @click="showDrawer = false" type="button" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition-colors">
+						<i data-lucide="x" class="w-5 h-5"></i>
+					</button>
+				</div>
+
+				<form action="/tasks" method="POST" class="space-y-5">
+					<div>
+						<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Task Title *</label>
+						<input type="text" name="title" required placeholder="e.g. Implement user authentication logic" class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"/>
+					</div>
+
+					<div>
+						<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Description</label>
+						<textarea name="description" rows="3" placeholder="Task details & acceptance criteria..." class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm leading-relaxed"></textarea>
+					</div>
+
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Status</label>
+							<select name="status" class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+								<option value="todo" selected>To Do</option>
+								<option value="in_progress">In Progress</option>
+								<option value="done">Completed</option>
+							</select>
+						</div>
+
+						<div>
+							<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Priority</label>
+							<select name="priority" class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+								<option value="low">Low</option>
+								<option value="medium" selected>Medium</option>
+								<option value="high">High</option>
+								<option value="critical">Critical</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Energy Level</label>
+							<select name="energy_level" class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+								<option value="low">Low Energy</option>
+								<option value="medium" selected>Medium Energy</option>
+								<option value="high">High Focus</option>
+							</select>
+						</div>
+
+						<div>
+							<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Link Project</label>
+							<select name="project_id" class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+								<option value="0" selected>None (Standalone Task)</option>
+								for _, proj := range availableProjects {
+									<option value={ fmt.Sprintf("%d", proj.ID) }>{ proj.Name }</option>
+								}
+							</select>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Due Date</label>
+							<input type="date" name="due_date" class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+						</div>
+
+						<div>
+							<label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Est. Minutes</label>
+							<input type="number" name="estimated_minutes" placeholder="30" class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+						</div>
+					</div>
+
+					<div class="pt-6 flex justify-end gap-3 border-t border-slate-800">
+						<button @click="showDrawer = false" type="button" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-colors">Cancel</button>
+						<button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all">Create Task</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+}
+
+templ TaskContent(taskList []TaskWithDetails, availableProjects []db.Project, currentFilter string, viewMode string) {
+	if len(taskList) == 0 {
+		<div class="text-center py-20 px-4 glass-panel rounded-3xl space-y-4">
+			<div class="w-14 h-14 rounded-2xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto text-2xl font-bold border border-slate-700">
+				<i data-lucide="check-circle-2" class="w-7 h-7"></i>
+			</div>
+			<h3 class="text-xl font-bold text-white">No tasks found</h3>
+			<p class="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
+				No tasks match your current filter parameters. Create a new task or reset your search query.
+			</p>
+		</div>
+	} else if viewMode == "kanban" {
+		@TaskKanban(taskList)
+	} else {
+		@TaskListTable(taskList)
+	}
+}
+
+templ TaskListTable(taskList []TaskWithDetails) {
+	<div class="glass-panel rounded-3xl overflow-hidden">
+		<div class="divide-y divide-slate-800/60">
+			for _, t := range taskList {
+				<div class="p-5 flex items-center justify-between gap-4 hover:bg-slate-800/40 transition-colors">
+					<div class="flex items-center gap-4 min-w-0 flex-1">
+						<!-- Toggle Status Form -->
+						<form action={ templ.URL(fmt.Sprintf("/tasks/%d/status", t.Task.ID)) } method="POST">
+							if t.Task.Status == "done" {
+								<input type="hidden" name="status" value="todo"/>
+								<button type="submit" class="text-emerald-400 hover:text-slate-400 transition-colors">
+									<i data-lucide="check-circle-2" class="w-5 h-5"></i>
+								</button>
+							} else {
+								<input type="hidden" name="status" value="done"/>
+								<button type="submit" class="text-slate-600 hover:text-emerald-400 transition-colors">
+									<i data-lucide="circle" class="w-5 h-5"></i>
+								</button>
+							}
+						</form>
+
+						<div class="space-y-1 min-w-0">
+							<div class="flex items-center gap-3">
+								<span class={ taskTitleClass(t.Task.Status == "done") }>{ t.Task.Title }</span>
+								<span class={ priorityPillClass(t.Task.Priority) }>{ t.Task.Priority }</span>
+							</div>
+
+							<div class="flex items-center gap-3 text-xs text-slate-400 font-mono-code">
+								if t.ProjectName != "" {
+									<span class="flex items-center gap-1 text-indigo-400">
+										<i data-lucide="folder" class="w-3 h-3"></i>
+										<span>{ t.ProjectName }</span>
+									</span>
+								}
+								<span class="flex items-center gap-1">
+									<i data-lucide="zap" class="w-3 h-3 text-amber-400"></i>
+									<span>{ t.Task.EnergyLevel }</span>
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-3">
+						<form action={ templ.URL(fmt.Sprintf("/tasks/%d/delete", t.Task.ID)) } method="POST" onsubmit="return confirm('Delete this task?');">
+							<button type="submit" title="Delete Task" class="text-slate-500 hover:text-rose-400 transition-colors p-1.5 rounded-lg hover:bg-slate-800">
+								<i data-lucide="trash-2" class="w-4 h-4"></i>
+							</button>
+						</form>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+}
+
+templ TaskKanban(taskList []TaskWithDetails) {
+	<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+		<!-- Column: To Do -->
+		<div class="glass-panel p-6 rounded-3xl space-y-4">
+			<div class="flex items-center justify-between border-b border-slate-800 pb-3">
+				<h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+					<i data-lucide="circle" class="w-4 h-4 text-slate-400"></i>
+					<span>To Do</span>
+				</h3>
+			</div>
+
+			<div class="space-y-3">
+				for _, t := range taskList {
+					if t.Task.Status == "todo" {
+						@KanbanCard(t)
+					}
+				}
+			</div>
+		</div>
+
+		<!-- Column: In Progress -->
+		<div class="glass-panel p-6 rounded-3xl space-y-4">
+			<div class="flex items-center justify-between border-b border-slate-800 pb-3">
+				<h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+					<i data-lucide="play-circle" class="w-4 h-4 text-indigo-400"></i>
+					<span>In Progress</span>
+				</h3>
+			</div>
+
+			<div class="space-y-3">
+				for _, t := range taskList {
+					if t.Task.Status == "in_progress" {
+						@KanbanCard(t)
+					}
+				}
+			</div>
+		</div>
+
+		<!-- Column: Completed -->
+		<div class="glass-panel p-6 rounded-3xl space-y-4">
+			<div class="flex items-center justify-between border-b border-slate-800 pb-3">
+				<h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+					<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+					<span>Completed</span>
+				</h3>
+			</div>
+
+			<div class="space-y-3">
+				for _, t := range taskList {
+					if t.Task.Status == "done" {
+						@KanbanCard(t)
+					}
+				}
+			</div>
+		</div>
+	</div>
+}
+
+templ KanbanCard(t TaskWithDetails) {
+	<div class="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3 hover:border-slate-700 transition-all">
+		<div class="flex items-start justify-between gap-3">
+			<h4 class="text-sm font-bold text-white leading-snug">{ t.Task.Title }</h4>
+			<span class={ priorityPillClass(t.Task.Priority) }>{ t.Task.Priority }</span>
+		</div>
+
+		if t.ProjectName != "" {
+			<div class="text-[11px] font-mono-code text-indigo-400 flex items-center gap-1">
+				<i data-lucide="folder" class="w-3 h-3"></i>
+				<span>{ t.ProjectName }</span>
+			</div>
+		}
+
+		<div class="flex items-center justify-between pt-2 border-t border-slate-800/80">
+			<form action={ templ.URL(fmt.Sprintf("/tasks/%d/status", t.Task.ID)) } method="POST" class="flex items-center gap-1">
+				if t.Task.Status == "todo" {
+					<input type="hidden" name="status" value="in_progress"/>
+					<button type="submit" class="px-2 py-1 rounded-md bg-indigo-500/10 text-indigo-400 text-[10px] font-mono-code hover:bg-indigo-500/20">Move to Progress</button>
+				} else if t.Task.Status == "in_progress" {
+					<input type="hidden" name="status" value="done"/>
+					<button type="submit" class="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-mono-code hover:bg-emerald-500/20">Mark Done</button>
+				}
+			</form>
+
+			<form action={ templ.URL(fmt.Sprintf("/tasks/%d/delete", t.Task.ID)) } method="POST">
+				<button type="submit" class="text-slate-500 hover:text-rose-400 transition-colors p-1">
+					<i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+				</button>
+			</form>
+		</div>
+	</div>
+}

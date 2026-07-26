@@ -30,12 +30,13 @@
 
 ---
 
-## v0.2.0 — Projects + Tasks
+## v0.2.0 — Projects + Tasks *(Shipped 2026-07-26)*
 
-- [ ] Projects: CRUD, milestones, timeline
-- [ ] Tasks: CRUD, List view, Kanban view
-- [ ] Task dependencies
-- [ ] Task → Project linking + progress auto-calculation
+- [x] Projects: CRUD, milestones, tech stack tags, GitHub REST integration
+- [x] Tasks: CRUD, List view, 3-column Kanban view
+- [x] Task dependencies, priority, energy levels
+- [x] Task → Project linking + progress auto-calculation
+- [x] Linear/Vercel-inspired Slate Obsidian theme with zero emojis & Lucide SVG icons
 
 ---
 

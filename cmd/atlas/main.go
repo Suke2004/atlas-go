@@ -85,6 +85,10 @@ func main() {
 	projectsSvc := projects.NewService(projectsRepo, nil)
 	projectsHandler := projects.NewHandler(projectsSvc, log)
 
+	tasksRepo := tasks.NewRepository(database)
+	tasksSvc := tasks.NewService(tasksRepo, projectsRepo, projectsSvc)
+	tasksHandler := tasks.NewHandler(tasksSvc, projectsRepo, log)
+
 	// ── 6. Router ──────────────────────────────────────────────────────────
 	r := chi.NewRouter()
 
@@ -145,6 +149,12 @@ func main() {
 		protected.Post("/projects/{id}/milestones", projectsHandler.CreateMilestone)
 		protected.Post("/projects/{id}/milestones/{milestoneID}/toggle", projectsHandler.ToggleMilestone)
 		protected.Post("/projects/{id}/milestones/{milestoneID}/delete", projectsHandler.DeleteMilestone)
+
+		// Tasks Module Routes
+		protected.Get("/tasks", tasksHandler.List)
+		protected.Post("/tasks", tasksHandler.Create)
+		protected.Post("/tasks/{id}/status", tasksHandler.UpdateStatus)
+		protected.Post("/tasks/{id}/delete", tasksHandler.Delete)
 	})
 
 	// ── 7. Server ──────────────────────────────────────────────────────────

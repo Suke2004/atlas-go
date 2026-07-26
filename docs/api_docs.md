@@ -1,138 +1,83 @@
-# Atlas — System API Reference & Endpoint Registry
+# Atlas HTTP API Documentation
 
-> **Purpose**: Authoritative single source of truth for all HTTP endpoints, routes, request formats, response types, and HTMX swap fragments across the Atlas personal operating system.
-> **Rule**: Every phase MUST update this file whenever new routes or endpoints are added.
+This document records all HTTP API routes, request parameters, responses, HTMX partial fragments, and status codes implemented across Atlas phases.
 
 ---
 
-## Global System & Health Endpoints
+## Registered API Endpoints
 
 ### 1. Health Check
 - **Route**: `GET /health`
-- **Auth Required**: No (Public)
-- **Description**: Returns system health, version, uptime, and database connection status.
-- **Response Format**: `application/json`
-- **Sample Response**:
-  ```json
-  {
-    "status": "ok",
-    "version": "dev",
-    "uptime_seconds": 1420
-  }
-  ```
+- **Auth Required**: No
+- **Response**: `200 OK` → `{"status": "ok", "app": "Atlas"}`
 
----
-
-## System Static Assets
-
-### 2. Static Asset Delivery
-- **Route**: `GET /static/*`
-- **Auth Required**: No (Public)
-- **Description**: Serves local bundled CSS, JS, and font assets (`/static/css/app.css`, `/static/js/htmx.min.js`, `/static/js/alpine.min.js`, `/static/js/lucide.min.js`).
-- **Response Format**: CSS / JavaScript / Asset binary.
-
----
-
-## First-Run Setup & Onboarding Wizard (`internal/setup`)
-
-### 3. Show Setup Wizard
+### 2. First-Run Onboarding Wizard Page
 - **Route**: `GET /setup`
-- **Auth Required**: No (Intercepted by `FirstRunGate` middleware when `CountUsers() == 0`)
-- **Description**: Renders multi-step account creation wizard HTML view.
-- **Response Format**: `text/html; charset=utf-8`
+- **Auth Required**: No (`FirstRunGate` bypasses if `CountUsers() == 0`)
+- **Response Format**: `text/html; charset=utf-8` (Renders Setup Templ template)
 
-### 4. Process First-Run Setup
+### 3. Process Onboarding Account Creation
 - **Route**: `POST /setup`
-- **Auth Required**: No (First-Run Gate)
-- **Parameters** (`application/x-www-form-urlencoded`):
-  - `display_name` (string, required) — e.g. "Alex Mercer"
-  - `username` (string, required) — e.g. "alex"
-  - `email` (string, optional) — e.g. "alex@local"
-  - `password` (string, required) — bcrypt hashed (cost 12)
-  - `timezone` (string, required) — e.g. "UTC", "Asia/Kolkata"
-  - `theme` (string, required) — "system" | "dark" | "light"
-- **Behavior**: Creates primary owner account in SQLite, creates session cookie, and redirects to `/setup/demo-choice`.
-- **Response**: `302 Found` → `/setup/demo-choice` or `200 OK` with error form.
+- **Auth Required**: No
+- **Form Parameters**: `username` (required), `display_name` (required), `password` (required), `timezone` (optional)
+- **Response**: `303 See Other` → `/setup/demo-choice` (Creates session cookie `atlas_session`)
 
-### 5. Show Demo Choice Screen
+### 4. Show Seed Demo Choice Page
 - **Route**: `GET /setup/demo-choice`
-- **Auth Required**: No (First-Run Gate)
-- **Description**: Offers option to seed sample projects, tasks, and notes into database.
+- **Auth Required**: Yes (`AuthRequired` middleware)
 - **Response Format**: `text/html; charset=utf-8`
 
-### 6. Process Demo Seed
+### 5. Process Demo Data Seeding
 - **Route**: `POST /setup/seed`
-- **Auth Required**: No (First-Run Gate)
-- **Behavior**: Executes `setup.SeedDemoData()`, populates sample project, tasks, notes, and journal entry, then redirects to `/login`.
-- **Response**: `302 Found` → `/login`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `action` ("seed" | "skip")
+- **Response**: `303 See Other` → `/` (Dashboard root)
 
----
-
-## Authentication & Session Management (`internal/auth`)
-
-### 7. Show Login Page
+### 6. Show Login Page
 - **Route**: `GET /login`
 - **Auth Required**: No
-- **Description**: Renders login credential form view.
 - **Response Format**: `text/html; charset=utf-8`
 
-### 8. Process Login
+### 7. Process User Authentication
 - **Route**: `POST /login`
-- **Auth Required**: No (Rate limited: ≤5 attempts/minute)
-- **Parameters** (`application/x-www-form-urlencoded`):
-  - `username` (string, required)
-  - `password` (string, required)
-- **Behavior**: Validates credentials against bcrypt hash, generates 32-byte session token, stores session token in SQLite `sessions` table, sets HTTP-only `SameSite=Lax` cookie, and redirects to `/`.
-- **Response**: `302 Found` → `/` or `200 OK` with error form.
+- **Auth Required**: No
+- **Form Parameters**: `username` (required), `password` (required)
+- **Response**: `303 See Other` → `/` on success, or `401 Unauthorized` HTML on failure.
 
-### 9. Logout
+### 8. User Logout
 - **Route**: `POST /logout`
 - **Auth Required**: Yes (`AuthRequired` middleware)
-- **Behavior**: Destroys session token in SQLite, clears session cookie, and redirects to `/login`.
-- **Response**: `302 Found` → `/login`
+- **Response**: `303 See Other` → `/login` (Clears session cookie)
 
----
-
-## Protected Application Routes (`layout.Base` Shell)
-
-### 10. Dashboard / Layout Shell Root
+### 9. Application Dashboard (Root Layout Shell)
 - **Route**: `GET /`
 - **Auth Required**: Yes (`AuthRequired` middleware)
-- **Description**: Renders primary layout shell (`base.templ`) with sidebar, topbar, theme switcher, and welcome dashboard widget.
 - **Response Format**: `text/html; charset=utf-8`
 
----
-
----
-
-## Projects Module (`internal/projects`) — Phase 4
+### 10. Serve Static Assets
+- **Route**: `GET /static/*`
+- **Auth Required**: No
+- **Response**: Static file assets (CSS, JS, Lucide icons, web fonts).
 
 ### 11. List Projects & Filter Tabs
 - **Route**: `GET /projects`
 - **Auth Required**: Yes (`AuthRequired` middleware)
 - **Query Parameters**:
   - `status` (string, optional) — "all" | "active" | "completed" | "archived"
-- **Behavior**: Returns Project Cards grid with Tech Stack badges, GitHub star/fork metrics, progress bars, and status filters. Supports HTMX partial swap (`HX-Target: projects-grid`).
+  - `tag` (string, optional) — Tech stack tag filter e.g. "Go"
+  - `view` (string, optional) — "grid" | "table" | "roadmap"
+  - `search` (string, optional) — Live query string
 - **Response Format**: `text/html; charset=utf-8`
 
 ### 12. Create Project
 - **Route**: `POST /projects`
 - **Auth Required**: Yes (`AuthRequired` middleware)
-- **Form Parameters** (`application/x-www-form-urlencoded`):
-  - `name` (string, required)
-  - `description` (string, optional)
-  - `status` (string, optional) — "active" | "completed" | "archived" | "on_hold"
-  - `color` (string, optional) — hex color e.g. "#6366f1"
-  - `target_date` (string, optional)
-  - `github_url` (string, optional) — e.g. "https://github.com/owner/repo"
-  - `tech_stack` (string, optional) — comma-separated e.g. "Go, SQLite, HTMX, TailwindCSS"
-- **Behavior**: Auto-queries GitHub API for repo stats and tech stack if `github_url` provided, inserts project record into SQLite, and redirects to `/projects`.
+- **Form Parameters**: `name`, `description`, `status`, `color`, `target_date`, `github_url`, `tech_stack`.
 - **Response**: `303 See Other` → `/projects`
 
 ### 13. Project Detail View
 - **Route**: `GET /projects/{id}`
 - **Auth Required**: Yes (`AuthRequired` middleware)
-- **Description**: Renders Project Detail page with header, Tech Stack pills, GitHub Insights Card, Milestone Checklist, and edit/delete modals.
 - **Response Format**: `text/html; charset=utf-8`
 
 ### 14. Update Project
@@ -144,40 +89,56 @@
 ### 15. Delete Project
 - **Route**: `POST /projects/{id}/delete`
 - **Auth Required**: Yes (`AuthRequired` middleware)
-- **Behavior**: Deletes project and associated milestones from SQLite.
 - **Response**: `303 See Other` → `/projects`
 
 ### 16. Sync GitHub Stats
 - **Route**: `POST /projects/{id}/sync-github`
 - **Auth Required**: Yes (`AuthRequired` middleware)
-- **Behavior**: Fetches latest repo stars, forks, open issues, primary language, and tech stack from GitHub API and updates SQLite.
 - **Response Format**: `text/html; charset=utf-8` (HTMX `GitHubCard` fragment)
 
 ### 17. Import GitHub Issues as Milestones
 - **Route**: `POST /projects/{id}/import-issues`
 - **Auth Required**: Yes (`AuthRequired` middleware)
-- **Behavior**: Fetches open GitHub issues and converts them into project milestones.
 - **Response**: `303 See Other` → `/projects/{id}`
 
 ### 18. Add Milestone
 - **Route**: `POST /projects/{id}/milestones`
 - **Auth Required**: Yes (`AuthRequired` middleware)
-- **Form Parameters**: `title` (string, required), `due_date` (string, optional).
-- **Behavior**: Inserts milestone, recalculates project progress %, and redirects.
+- **Form Parameters**: `title`, `due_date`.
 - **Response**: `303 See Other` → `/projects/{id}`
 
 ### 19. Toggle Milestone Completion
 - **Route**: `POST /projects/{id}/milestones/{milestoneID}/toggle`
 - **Auth Required**: Yes (`AuthRequired` middleware)
-- **Form Parameters**: `completed` ("true" | "false")
-- **Behavior**: Toggles milestone completion state, records completion timestamp, recalculates project progress %, and redirects.
 - **Response**: `303 See Other` → `/projects/{id}`
 
 ### 20. Delete Milestone
 - **Route**: `POST /projects/{id}/milestones/{milestoneID}/delete`
 - **Auth Required**: Yes (`AuthRequired` middleware)
-- **Behavior**: Deletes milestone, recalculates project progress %, and redirects.
 - **Response**: `303 See Other` → `/projects/{id}`
+
+### 21. List Tasks & Kanban View
+- **Route**: `GET /tasks`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Query Parameters**: `status`, `priority`, `energy`, `view` ("list" | "kanban"), `search`.
+- **Response Format**: `text/html; charset=utf-8`
+
+### 22. Create Task
+- **Route**: `POST /tasks`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `title`, `description`, `status`, `priority`, `energy_level`, `project_id`, `due_date`, `estimated_minutes`.
+- **Response**: `303 See Other` → `/tasks`
+
+### 23. Update Task Status
+- **Route**: `POST /tasks/{id}/status`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `status` ("todo" | "in_progress" | "done")
+- **Response**: `303 See Other` → `/tasks`
+
+### 24. Delete Task
+- **Route**: `POST /tasks/{id}/delete`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Response**: `303 See Other` → `/tasks`
 
 ---
 
@@ -185,8 +146,6 @@
 
 | Phase | Method | Route | Description | Response Type |
 |-------|--------|-------|-------------|---------------|
-| **Phase 5** | `GET` | `/tasks` | Task list & Kanban view | HTML Page / Partial |
 | **Phase 6** | `GET` | `/notes` | Knowledge Base editor & wiki links | HTML Page |
 | **Phase 8** | `GET` | `/journal` | Daily journal mood/energy entry | HTML Page |
 | **Phase 9** | `GET` | `/search` | Global search query | HTMX Search JSON/HTML |
-

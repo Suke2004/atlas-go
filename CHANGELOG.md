@@ -7,22 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [v0.2.0] - 2026-07-26
 
 ### Added
-- Projects Module — **Celestial Cartography Design System**: Deep Abyssal Navy palette (`#070e1b`), cartographic grid overlay, Outfit UI typography, Space Mono code/metrics font, and glassmorphic panels with cyan/amber neon glowing accents.
-- **Executive Hero Metrics Banner**: Active Initiatives count, Milestone Completion Ratio (`18/24 — 75%`), Total GitHub Stars, and Workspace Tech Stack Diversity.
-- **Multi-View Modes Switcher**: Toggle between 🎴 **Grid View**, 📋 **Compact Table Ledger View**, and 📅 **Roadmap Timeline View**.
-- **Interactive Tech Stack Filtering & Live Search**: Clickable tech stack badge pills (`#Go`, `#SQLite`, `#HTMX`, `#TailwindCSS`) and real-time live search query filtering.
-- **Slide-Over Drawer**: Smooth Alpine.js right slide-over drawer for creating and initializing new projects.
-- **GitHub Integration**: Repository URL import, cached stars/forks/open issues, one-click HTMX stats sync, and GitHub issue milestone importer.
-
-
-
+- **Tasks Module & Product-Grade Slate Interface**:
+  - Full Task CRUD engine with List & 3-Column Kanban Board views (`To Do`, `In Progress`, `Completed`).
+  - Linear/Vercel-inspired Slate Obsidian design system (`#090d16`) with zero emojis and crisp Lucide SVG vector iconography.
+  - Multi-axis task filtering: Status tabs, Priority (`Critical`, `High`, `Medium`, `Low`), Energy levels (`High`, `Medium`, `Low`), and Project linking.
+  - Task Dependencies, estimated/actual minutes, due date tracking, and right slide-over inspector drawer.
+  - Automatic project completion % recalculation whenever linked tasks are updated.
 
 ---
 
-## [v0.1.0] - TBD
+## [v0.1.0] - 2026-07-26
 
 ### Added
 - Go server with Chi router and Templ templates

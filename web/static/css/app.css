@@ -1,94 +1,92 @@
-/* Atlas — Meridian Spectrum & Command Center Design System */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* Atlas Workspace — Linear & Vercel Inspired Production Design System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --font-ui: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Theme: Atlas Meridian Horizon & Command Center */
-  --bg-atlas-base: #0a0e17;
-  --bg-atlas-surface: #111726;
-  --bg-atlas-card: rgba(17, 23, 38, 0.8);
-  --bg-atlas-card-hover: rgba(26, 35, 57, 0.9);
+  /* Theme: Slate & Obsidian Charcoal (No purple blobs or AI gradients) */
+  --bg-app: #090d16;
+  --bg-surface: #111726;
+  --bg-card: #161e2e;
+  --bg-card-hover: #1c263b;
 
-  --border-atlas: rgba(99, 102, 241, 0.15);
-  --border-atlas-hover: rgba(99, 102, 241, 0.4);
+  --border-subtle: #1e293b;
+  --border-strong: #334155;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
 
-  /* Purpose Accents */
-  --accent-indigo: #818cf8;
-  --accent-cyan: #22d3ee;
-  --accent-amber: #fbbf24;
-  --accent-emerald: #34d399;
-  --accent-rose: #f43f5e;
+  /* Functional Status Colors */
+  --accent-blue: #3b82f6;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #ef4444;
+  --accent-cyan: #06b6d4;
 }
 
 html[data-theme="light"] {
-  --bg-atlas-base: #f8fafc;
-  --bg-atlas-surface: #ffffff;
-  --bg-atlas-card: rgba(255, 255, 255, 0.9);
-  --bg-atlas-card-hover: rgba(241, 245, 249, 0.95);
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
 
-  --border-atlas: rgba(99, 102, 241, 0.15);
-  --border-atlas-hover: rgba(99, 102, 241, 0.4);
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #94a3b8;
 }
 
 body {
-  font-family: var(--font-ui);
-  background-color: var(--bg-atlas-base);
-  color: var(--text-primary);
-
-  /* Subtle Meridian Horizon Mesh Background */
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(34, 211, 238, 0.06) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(251, 191, 36, 0.04) 0px, transparent 50%);
-  background-attachment: fixed;
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Meridian Glass Panel */
-.glass-panel {
-  background: var(--bg-atlas-card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border-atlas);
-  box-shadow: 
-    0 10px 30px -10px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+/* Linear-style Surface Panels */
+.ui-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.glass-panel:hover {
-  border-color: var(--border-atlas-hover);
-  box-shadow: 
-    0 20px 40px -15px rgba(99, 102, 241, 0.18),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+.ui-card:hover {
+  border-color: var(--border-strong);
+  background-color: var(--bg-card-hover);
 }
 
-/* Monospace font utility for code & metrics */
 .font-mono-code {
   font-family: var(--font-mono);
 }
 
-/* Tech Stack Badges */
-.badge-tech {
-  font-family: var(--font-mono);
-  background: rgba(34, 211, 238, 0.08);
-  border: 1px solid rgba(34, 211, 238, 0.2);
-  color: #67e8f9;
-  transition: all 0.15s ease;
+/* Clean Status Pills */
+.status-pill-todo {
+  background: rgba(100, 116, 139, 0.1);
+  border: 1px solid rgba(100, 116, 139, 0.25);
+  color: #cbd5e1;
 }
 
-.badge-tech:hover {
-  background: rgba(34, 211, 238, 0.18);
-  border-color: rgba(34, 211, 238, 0.45);
-  color: #ffffff;
+.status-pill-progress {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+}
+
+.status-pill-done {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #34d399;
+}
+
+.status-pill-critical {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
 }
 
 /* Custom Scrollbar */
@@ -104,7 +102,7 @@ body {
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.5);
+  background: rgba(148, 163, 184, 0.4);
 }
 
 /* Toast Animations */
@@ -120,5 +118,5 @@ body {
 }
 
 .toast-animate-in {
-  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

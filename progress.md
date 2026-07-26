@@ -50,7 +50,7 @@
 | 2 | Auth + Setup Wizard | ✅ | 2026-07-26 | 2026-07-26 | First-run wizard, login/logout, sessions |
 | 3 | Layout Shell | ✅ | 2026-07-26 | 2026-07-26 | Sidebar, topbar, theme system, static assets |
 | 4 | Projects Module | ✅ | 2026-07-26 | 2026-07-26 | CRUD, GitHub repo stats, Tech Stack badges, milestones |
-| 5 | Tasks Module | ⬜ | — | — | List, Kanban, task dependencies |
+| 5 | Tasks Module | ✅ | 2026-07-26 | 2026-07-26 | List, 3-column Kanban, Slate Obsidian theme, Lucide icons, task dependencies |
 | 6 | Knowledge Base | ⬜ | — | — | Markdown editor, note linking, autosave |
 | 7 | Dashboard | ⬜ | — | — | Live widgets (real data) |
 | 8 | Journal Module | ⬜ | — | — | Mood/energy/sleep, on-blur save |
@@ -338,7 +338,7 @@ Only after every box is checked is the milestone truly complete.
 | 2 — Auth + Wizard | [docs/retros/phase-2.md](docs/retros/phase-2.md) | ✅ Written |
 | 3 — Layout Shell | [docs/retros/phase-3.md](docs/retros/phase-3.md) | ✅ Written |
 | 4 — Projects | [docs/retros/phase-4.md](docs/retros/phase-4.md) | ✅ Written |
-| 5 — Tasks | [docs/retros/phase-5.md](docs/retros/phase-5.md) | ⬜ Not written |
+| 5 — Tasks | [docs/retros/phase-5.md](docs/retros/phase-5.md) | ✅ Written |
 | 6 — Knowledge Base | [docs/retros/phase-6.md](docs/retros/phase-6.md) | ⬜ Not written |
 | 7 — Dashboard | [docs/retros/phase-7.md](docs/retros/phase-7.md) | ⬜ Not written |
 | 8 — Journal | [docs/retros/phase-8.md](docs/retros/phase-8.md) | ⬜ Not written |
