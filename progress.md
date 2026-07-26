@@ -48,7 +48,7 @@
 | 0 | Scaffolding | ✅ | 2026-07-26 | 2026-07-26 | Go server, Makefile, Air, Docker, /data layout |
 | 1 | Database | ✅ | 2026-07-26 | 2026-07-26 | Migrations, sqlc, WAL, FTS5 triggers |
 | 2 | Auth + Setup Wizard | ✅ | 2026-07-26 | 2026-07-26 | First-run wizard, login/logout, sessions |
-| 3 | Layout Shell | ⬜ | — | — | Sidebar, topbar, theme system |
+| 3 | Layout Shell | ✅ | 2026-07-26 | 2026-07-26 | Sidebar, topbar, theme system, static assets |
 | 4 | Projects Module | ⬜ | — | — | CRUD, milestones, timeline |
 | 5 | Tasks Module | ⬜ | — | — | List, Kanban, task dependencies |
 | 6 | Knowledge Base | ⬜ | — | — | Markdown editor, note linking, autosave |
@@ -128,15 +128,15 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 	emplates/layout/base.templ | ⬜ | HTML shell with data-theme attr |
-| 	emplates/layout/sidebar.templ | ⬜ | Nav links + active state |
-| 	emplates/layout/topbar.templ | ⬜ | Title + search trigger |
-| static/css/app.css | ⬜ | CSS tokens, light/dark/system theme |
-| static/js/htmx.min.js | ⬜ | Local copy, no CDN |
-| static/js/alpine.min.js | ⬜ | Local copy, no CDN |
-| HTMX boost on all <a> links | ⬜ | SPA-like nav |
-| Theme: Light / Dark / System | ⬜ | CSS custom properties |
-| Theme persists across page reloads | ⬜ | |
+| `templates/layout/base.templ` | ✅ | HTML shell with data-theme attr |
+| `templates/layout/sidebar.templ` | ✅ | Nav links + active state |
+| `templates/layout/topbar.templ` | ✅ | Title + search trigger |
+| `static/css/app.css` | ✅ | CSS tokens, light/dark/system theme |
+| `static/js/htmx.min.js` | ✅ | Local copy, no CDN |
+| `static/js/alpine.min.js` | ✅ | Local copy, no CDN |
+| HTMX boost on all `<a>` links | ✅ | SPA-like nav |
+| Theme: Light / Dark / System | ✅ | CSS custom properties |
+| Theme persists across page reloads | ✅ | |
 
 ---
 
@@ -337,7 +337,7 @@ Only after every box is checked is the milestone truly complete.
 | 0 — Scaffolding | [docs/retros/phase-0.md](docs/retros/phase-0.md) | ✅ Written |
 | 1 — Database | [docs/retros/phase-1.md](docs/retros/phase-1.md) | ✅ Written |
 | 2 — Auth + Wizard | [docs/retros/phase-2.md](docs/retros/phase-2.md) | ✅ Written |
-| 3 — Layout Shell | [docs/retros/phase-3.md](docs/retros/phase-3.md) | ⬜ Not written |
+| 3 — Layout Shell | [docs/retros/phase-3.md](docs/retros/phase-3.md) | ✅ Written |
 | 4 — Projects | [docs/retros/phase-4.md](docs/retros/phase-4.md) | ⬜ Not written |
 | 5 — Tasks | [docs/retros/phase-5.md](docs/retros/phase-5.md) | ⬜ Not written |
 | 6 — Knowledge Base | [docs/retros/phase-6.md](docs/retros/phase-6.md) | ⬜ Not written |

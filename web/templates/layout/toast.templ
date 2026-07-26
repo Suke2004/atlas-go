@@ -1,0 +1,46 @@
+package layout
+
+type ToastLevel string
+
+const (
+	ToastSuccess ToastLevel = "success"
+	ToastError   ToastLevel = "error"
+	ToastWarning ToastLevel = "warning"
+	ToastInfo    ToastLevel = "info"
+)
+
+templ Toast(message string, level ToastLevel) {
+	<div class={ "toast-animate-in flex items-center gap-3 p-4 rounded-xl shadow-2xl border text-sm font-medium transition-all max-w-sm " + toastStyle(level) } x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
+		<i data-lucide={ toastIcon(level) } class="w-5 h-5 flex-shrink-0"></i>
+		<span class="flex-1">{ message }</span>
+		<button @click="show = false" type="button" class="text-slate-400 hover:text-white transition-colors">
+			<i data-lucide="x" class="w-4 h-4"></i>
+		</button>
+	</div>
+}
+
+func toastStyle(level ToastLevel) string {
+	switch level {
+	case ToastSuccess:
+		return "bg-emerald-950/90 border-emerald-800 text-emerald-200"
+	case ToastError:
+		return "bg-rose-950/90 border-rose-800 text-rose-200"
+	case ToastWarning:
+		return "bg-amber-950/90 border-amber-800 text-amber-200"
+	default:
+		return "bg-slate-900/90 border-slate-800 text-slate-200"
+	}
+}
+
+func toastIcon(level ToastLevel) string {
+	switch level {
+	case ToastSuccess:
+		return "check-circle"
+	case ToastError:
+		return "alert-octagon"
+	case ToastWarning:
+		return "alert-triangle"
+	default:
+		return "info"
+	}
+}

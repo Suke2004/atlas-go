@@ -7,13 +7,16 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
@@ -24,6 +27,7 @@ import (
 	"github.com/Suke2004/atlas-go/internal/health"
 	"github.com/Suke2004/atlas-go/internal/logger"
 	"github.com/Suke2004/atlas-go/internal/setup"
+	layouts "github.com/Suke2004/atlas-go/web/templates/layout"
 )
 
 func main() {
@@ -84,6 +88,9 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(zapRequestLogger(log))
 
+	// Serve local static assets (CSS, JS, icons)
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
+
 	// First-Run Gate Middleware — redirects to /setup if zero users exist
 	r.Use(setup.FirstRunGate(setupSvc))
 
@@ -101,13 +108,26 @@ func main() {
 	r.Post("/login", authHandler.ProcessLogin)
 	r.Post("/logout", authHandler.Logout)
 
-	// Protected routes (Phase 3+ layout, dashboard, modules)
+	// Protected application routes
 	r.Group(func(protected chi.Router) {
 		protected.Use(auth.AuthRequired(authSvc))
+
+		// Dashboard route (Root Layout Shell)
 		protected.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			user := auth.GetUserFromContext(r.Context())
+			username := "Owner"
+			if user != nil {
+				username = user.DisplayName
+			}
+
+			dashContent := templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
+				html := `<div class="space-y-6"><div class="p-6 rounded-2xl bg-gradient-to-r from-indigo-900/40 via-slate-900 to-slate-900 border border-indigo-500/20"><h2 class="text-2xl font-bold text-white mb-2">Welcome to your Atlas Operating System</h2><p class="text-slate-400 text-sm max-w-xl">Everything in your life, organized in one self-hosted workspace. Use the sidebar to navigate your Projects, Tasks, Knowledge Base, and Daily Journal.</p></div></div>`
+				_, err := io.WriteString(w, html)
+				return err
+			})
+
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			fmt.Fprintf(w, "<!DOCTYPE html><html><head><title>Atlas</title><script src='https://cdn.tailwindcss.com'></script></head><body class='bg-slate-950 text-white p-8'><div class='max-w-2xl mx-auto bg-slate-900 border border-slate-800 p-6 rounded-xl'><h1 class='text-2xl font-bold mb-2'>Atlas Workspace</h1><p class='text-slate-400 mb-4'>Welcome back, <strong>%s</strong>!</p><form action='/logout' method='POST'><button class='px-4 py-2 bg-rose-600 rounded-lg font-medium'>Log Out</button></form></div></body></html>", user.DisplayName)
+			_ = layouts.Base("Dashboard", "/", username, dashContent).Render(r.Context(), w)
 		})
 	})
 

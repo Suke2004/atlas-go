@@ -1,0 +1,55 @@
+package layout
+
+templ Base(title string, currentPath string, username string, content templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en" data-theme="dark" class="h-full bg-slate-950 text-slate-100">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title } — Atlas</title>
+			<!-- Custom Design System CSS -->
+			<link rel="stylesheet" href="/static/css/app.css"/>
+			<!-- Local Tailwind CSS Browser Engine -->
+			<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+			<!-- Local Vendor JS Libraries -->
+			<script src="/static/js/htmx.min.js"></script>
+			<script src="/static/js/alpine.min.js" defer></script>
+			<script src="/static/js/lucide.min.js"></script>
+			<script>
+				function setAtlasTheme(theme) {
+					document.documentElement.setAttribute('data-theme', theme);
+					localStorage.setItem('atlas_theme', theme);
+				}
+				(function() {
+					const saved = localStorage.getItem('atlas_theme') || 'dark';
+					document.documentElement.setAttribute('data-theme', saved);
+				})();
+			</script>
+		</head>
+		<body class="h-full flex overflow-hidden bg-slate-950 text-slate-100">
+			<!-- Sidebar Component -->
+			@Sidebar(currentPath, username)
+
+			<!-- Main Container -->
+			<div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+				<!-- Topbar Component -->
+				@Topbar(title, username)
+
+				<!-- Main Content Target (HTMX Swap Container) -->
+				<main id="main-content" class="flex-1 overflow-y-auto p-8 relative">
+					@content
+				</main>
+			</div>
+
+			<!-- Global Toast Container -->
+			<div id="toast-container" class="fixed bottom-6 right-6 space-y-3 z-50 pointer-events-none [&>*]:pointer-events-auto"></div>
+
+			<script>
+				lucide.createIcons();
+				document.body.addEventListener('htmx:afterSwap', function() {
+					lucide.createIcons();
+				});
+			</script>
+		</body>
+	</html>
+}

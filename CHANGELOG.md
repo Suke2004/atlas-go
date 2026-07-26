@@ -1,4 +1,4 @@
-﻿# Changelog
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -10,12 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Project scaffold and repository structure
-- Product Requirements Document (PRD v1.1)
-- Technical Requirements Document (TRD v1.1)
-- Engineering guidelines (guidelines.md)
-- Progress tracker (progress.md)
-- Future plans roadmap (future_plans.md)
+- Application Layout Shell (`web/templates/layout/base.templ`, `sidebar.templ`, `topbar.templ`, `toast.templ`)
+- Local vendor static asset delivery (`web/static/js/htmx.min.js`, `alpine.min.js`, `lucide.min.js`, `app.css`)
+- Light / Dark / System theme switcher with instant `localStorage` head listener
+- HTMX SPA-like boosted navigation links (`hx-boost="true"`)
+- Global Search trigger button (`Ctrl+K`)
+- Reusable toast notification system with color variants and auto-dismiss
+- Layout component test suite (`tests/unit/layout_test.go`)
+
 
 ---
 
