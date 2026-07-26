@@ -13,7 +13,7 @@
 | v0.2.0 — Projects + Tasks | ✅ Shipped (2026-07-26) |
 | v0.3.0 — Knowledge Base | ✅ Shipped (2026-07-26) |
 | v0.4.0 — Executive Mind-Sync Journal + Global Search | ✅ Shipped (2026-07-26) |
-| v0.5.0 — AI + Finance + Learning | ⬜ Planned |
+| v0.5.0 — Finance Engine + Tech Skill Roadmap | ✅ Shipped (2026-07-26) |
 | v1.0.0 — Stable | ⬜ Planned |
 
 ---

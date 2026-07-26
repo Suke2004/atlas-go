@@ -205,6 +205,45 @@ This document records all HTTP API routes, request parameters, responses, HTMX p
 - **Query Parameters**: `q`.
 - **Response Format**: `text/html; charset=utf-8` (Search Results Fragment)
 
+### 36. Finance Dashboard & Cost Attribution
+- **Route**: `GET /finance`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Response Format**: `text/html; charset=utf-8`
+
+### 37. Create Finance Transaction
+- **Route**: `POST /finance`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `amount`, `type`, `category`, `description`, `transaction_date`.
+- **Response**: `303 See Other` → `/finance`
+
+### 38. Delete Finance Transaction
+- **Route**: `POST /finance/{id}/delete`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Response**: `303 See Other` → `/finance`
+
+### 39. Learning Skill Roadmap Dashboard
+- **Route**: `GET /learning`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Response Format**: `text/html; charset=utf-8`
+
+### 40. Create Skill Track
+- **Route**: `POST /learning/tracks`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `title`, `category`, `description`.
+- **Response**: `303 See Other` → `/learning`
+
+### 41. Log Learning Study Session
+- **Route**: `POST /learning/sessions`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `track_id`, `duration_minutes`, `summary`.
+- **Response**: `303 See Other` → `/learning`
+
+### 42. Delete Skill Track
+- **Route**: `POST /learning/tracks/{id}/delete`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Response**: `303 See Other` → `/learning`
+
+
 
 
 ---

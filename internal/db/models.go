@@ -139,3 +139,43 @@ type SearchIndexRow struct {
 	Tags       string  `json:"tags"`
 	Rank       float64 `json:"rank"`
 }
+
+type Transaction struct {
+	ID              int64     `json:"id" db:"id"`
+	UserID          int64     `json:"user_id" db:"user_id"`
+	Amount          float64   `json:"amount" db:"amount"`
+	Type            string    `json:"type" db:"type"`
+	Category        string    `json:"category" db:"category"`
+	Description     string    `json:"description" db:"description"`
+	TransactionDate string    `json:"transaction_date" db:"transaction_date"`
+	CreatedAt       time.Time `json:"created_at" db:"created_at"`
+}
+
+type Budget struct {
+	ID           int64     `json:"id" db:"id"`
+	UserID       int64     `json:"user_id" db:"user_id"`
+	Category     string    `json:"category" db:"category"`
+	MonthlyLimit float64   `json:"monthly_limit" db:"monthly_limit"`
+	CreatedAt    time.Time `json:"created_at" db:"created_at"`
+}
+
+type LearningTrack struct {
+	ID            int64     `json:"id" db:"id"`
+	UserID        int64     `json:"user_id" db:"user_id"`
+	Title         string    `json:"title" db:"title"`
+	Category      string    `json:"category" db:"category"`
+	Description   string    `json:"description" db:"description"`
+	CurrentStreak int64     `json:"current_streak" db:"current_streak"`
+	LongestStreak int64     `json:"longest_streak" db:"longest_streak"`
+	CreatedAt     time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at" db:"updated_at"`
+}
+
+type LearningSession struct {
+	ID              int64     `json:"id" db:"id"`
+	TrackID         int64     `json:"track_id" db:"track_id"`
+	DurationMinutes int64     `json:"duration_minutes" db:"duration_minutes"`
+	Summary         string    `json:"summary" db:"summary"`
+	SessionDate     string    `json:"session_date" db:"session_date"`
+	CreatedAt       time.Time `json:"created_at" db:"created_at"`
+}

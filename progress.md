@@ -55,7 +55,9 @@
 | 7 | Dashboard | ✅ | 2026-07-26 | 2026-07-26 | Executive Command Center live widgets |
 | 8 | Journal Module | ✅ | 2026-07-26 | 2026-07-26 | Executive Mind-Sync, Mood/energy/sleep telemetry, 4-quadrant reflection |
 | 9 | Global Search | ✅ | 2026-07-26 | 2026-07-26 | Ctrl+K Command Palette modal overlay, SQLite FTS5 |
-| 10 | Settings + Polish | ⬜ | — | — | Theme toggle, skeleton loaders, toasts |
+| 10 | Settings + Polish | ✅ | 2026-07-26 | 2026-07-26 | Theme toggle, skeleton loaders, toasts |
+| 11 | Finance Engine | ✅ | 2026-07-26 | 2026-07-26 | Cash flow, zero-based budget, Project Infrastructure Cost Attribution USP |
+| 12 | Tech Skill Roadmap | ✅ | 2026-07-26 | 2026-07-26 | Interactive skill tree, study sessions, Mastery XP USP |
 
 ---
 

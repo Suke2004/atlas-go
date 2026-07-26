@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.5.0] - 2026-07-26
+
+### Added
+- **Finance Engine Module (`/finance`)**:
+  - Monthly cash flow banner tracking Total Income, Total Expenses, Net Savings, and Savings Rate percentage.
+  - Zero-based budget allocation and full transaction ledger.
+  - 🚀 **Atlas USP: *"Project-Linked Infrastructure Cost Attribution"***: Automatically attributes server hosting, domain fees, and SaaS API expenses directly to active **Atlas Projects**.
+- **Tech Skill Roadmap Engine (`/learning`)**:
+  - Interactive skill roadmap tracks grid with domain categories (`language`, `framework`, `dsa`, `course`).
+  - Active study streak counter and session logger.
+  - 🚀 **Atlas USP: *"Code-Verified Proof of Mastery"***: Mastery XP engine combining total study hours and active streaks with linked project proof.
+
+---
+
 ## [v0.4.0] - 2026-07-26
 
 ### Added

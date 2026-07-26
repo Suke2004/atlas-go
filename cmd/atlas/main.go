@@ -21,8 +21,10 @@ import (
 	"github.com/Suke2004/atlas-go/internal/auth"
 	"github.com/Suke2004/atlas-go/internal/config"
 	"github.com/Suke2004/atlas-go/internal/db"
+	"github.com/Suke2004/atlas-go/internal/finance"
 	"github.com/Suke2004/atlas-go/internal/health"
 	"github.com/Suke2004/atlas-go/internal/journal"
+	"github.com/Suke2004/atlas-go/internal/learning"
 	"github.com/Suke2004/atlas-go/internal/logger"
 	"github.com/Suke2004/atlas-go/internal/notes"
 	"github.com/Suke2004/atlas-go/internal/projects"
@@ -101,6 +103,14 @@ func main() {
 
 	searchSvc := search.NewService(database, projectsSvc, tasksSvc, notesSvc)
 	searchHandler := search.NewHandler(searchSvc, log)
+
+	financeRepo := finance.NewRepository(database)
+	financeSvc := finance.NewService(financeRepo, projectsRepo)
+	financeHandler := finance.NewHandler(financeSvc, log)
+
+	learningRepo := learning.NewRepository(database)
+	learningSvc := learning.NewService(learningRepo)
+	learningHandler := learning.NewHandler(learningSvc, log)
 
 	// ── 6. Router ──────────────────────────────────────────────────────────
 	r := chi.NewRouter()
@@ -190,6 +200,17 @@ func main() {
 
 		// Global Search API Route
 		protected.Get("/api/search", searchHandler.Search)
+
+		// Finance Module Routes
+		protected.Get("/finance", financeHandler.Index)
+		protected.Post("/finance", financeHandler.Create)
+		protected.Post("/finance/{id}/delete", financeHandler.Delete)
+
+		// Learning Track Module Routes
+		protected.Get("/learning", learningHandler.Index)
+		protected.Post("/learning/tracks", learningHandler.CreateTrack)
+		protected.Post("/learning/sessions", learningHandler.AddSession)
+		protected.Post("/learning/tracks/{id}/delete", learningHandler.DeleteTrack)
 	})
 
 	// ── 7. Server ──────────────────────────────────────────────────────────

@@ -57,7 +57,7 @@ func TestSearch_GlobalSearch(t *testing.T) {
 		t.Fatalf("failed to create project: %v", err)
 	}
 
-	n, err := notesSvc.CreateNote(ctx, user.ID, notes.NoteInput{
+	_, err = notesSvc.CreateNote(ctx, user.ID, notes.NoteInput{
 		Title:   "Atlas Architecture Guide",
 		Content: "Layered architecture design.",
 	})
