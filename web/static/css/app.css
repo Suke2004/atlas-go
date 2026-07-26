@@ -1,39 +1,39 @@
-/* Atlas — Celestial Cartography & Slate Architecture Design System */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+/* Atlas — Meridian Spectrum & Command Center Design System */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
   --font-ui: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'Space Mono', monospace;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  /* Theme: Atlas Abyssal Navy & Celestial Compass */
-  --bg-atlas-base: #070e1b;
-  --bg-atlas-surface: #0b132b;
-  --bg-atlas-card: rgba(28, 37, 65, 0.75);
-  --bg-atlas-card-hover: rgba(42, 54, 91, 0.85);
+  /* Theme: Atlas Meridian Horizon & Command Center */
+  --bg-atlas-base: #0a0e17;
+  --bg-atlas-surface: #111726;
+  --bg-atlas-card: rgba(17, 23, 38, 0.8);
+  --bg-atlas-card-hover: rgba(26, 35, 57, 0.9);
 
-  --border-atlas: rgba(72, 202, 228, 0.12);
-  --border-atlas-hover: rgba(72, 202, 228, 0.35);
+  --border-atlas: rgba(99, 102, 241, 0.15);
+  --border-atlas-hover: rgba(99, 102, 241, 0.4);
 
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
 
   /* Purpose Accents */
-  --compass-cyan: #48cae4;
-  --compass-blue: #3a86ff;
-  --horizon-amber: #f4a261;
-  --emerald-beacon: #2ec4b6;
-  --coral-warning: #e76f51;
+  --accent-indigo: #818cf8;
+  --accent-cyan: #22d3ee;
+  --accent-amber: #fbbf24;
+  --accent-emerald: #34d399;
+  --accent-rose: #f43f5e;
 }
 
 html[data-theme="light"] {
-  --bg-atlas-base: #f4f6fc;
+  --bg-atlas-base: #f8fafc;
   --bg-atlas-surface: #ffffff;
   --bg-atlas-card: rgba(255, 255, 255, 0.9);
   --bg-atlas-card-hover: rgba(241, 245, 249, 0.95);
 
-  --border-atlas: rgba(58, 134, 255, 0.15);
-  --border-atlas-hover: rgba(58, 134, 255, 0.4);
+  --border-atlas: rgba(99, 102, 241, 0.15);
+  --border-atlas-hover: rgba(99, 102, 241, 0.4);
 
   --text-primary: #0f172a;
   --text-secondary: #475569;
@@ -45,33 +45,33 @@ body {
   background-color: var(--bg-atlas-base);
   color: var(--text-primary);
 
-  /* Celestial Cartography Grid Overlay */
+  /* Subtle Meridian Horizon Mesh Background */
   background-image: 
-    linear-gradient(to right, rgba(72, 202, 228, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(72, 202, 228, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(34, 211, 238, 0.06) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(251, 191, 36, 0.04) 0px, transparent 50%);
   background-attachment: fixed;
 }
 
-/* Cartographic Glass Panel */
+/* Meridian Glass Panel */
 .glass-panel {
   background: var(--bg-atlas-card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-atlas);
   box-shadow: 
-    0 10px 30px -10px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+    0 10px 30px -10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
 }
 
 .glass-panel:hover {
   border-color: var(--border-atlas-hover);
   box-shadow: 
-    0 20px 40px -15px rgba(58, 134, 255, 0.15),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    0 20px 40px -15px rgba(99, 102, 241, 0.18),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
 }
 
-/* Monospace font utility for coordinates & metrics */
+/* Monospace font utility for code & metrics */
 .font-mono-code {
   font-family: var(--font-mono);
 }
@@ -79,19 +79,19 @@ body {
 /* Tech Stack Badges */
 .badge-tech {
   font-family: var(--font-mono);
-  background: rgba(72, 202, 228, 0.1);
-  border: 1px solid rgba(72, 202, 228, 0.25);
-  color: #72efdd;
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  color: #67e8f9;
   transition: all 0.15s ease;
 }
 
 .badge-tech:hover {
-  background: rgba(72, 202, 228, 0.2);
-  border-color: rgba(72, 202, 228, 0.5);
+  background: rgba(34, 211, 238, 0.18);
+  border-color: rgba(34, 211, 238, 0.45);
   color: #ffffff;
 }
 
-/* Custom Cartographic Scrollbar */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -100,11 +100,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(72, 202, 228, 0.2);
+  background: rgba(148, 163, 184, 0.2);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(72, 202, 228, 0.5);
+  background: rgba(99, 102, 241, 0.5);
 }
 
 /* Toast Animations */
