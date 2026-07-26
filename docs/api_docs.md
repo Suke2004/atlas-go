@@ -175,6 +175,37 @@ This document records all HTTP API routes, request parameters, responses, HTMX p
 - **Form Parameters**: `title`, `content`.
 - **Response Format**: `text/html; charset=utf-8` (`200 OK` fragment)
 
+### 31. Daily Reflection & Mind-Sync Dashboard
+- **Route**: `GET /journal`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Query Parameters**: `date` (format: `YYYY-MM-DD`).
+- **Response Format**: `text/html; charset=utf-8`
+
+### 32. Auto-Save Daily Telemetry & Summary
+- **Route**: `POST /journal/save`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `entry_date`, `mood_rating`, `energy_rating`, `sleep_hours`, `summary`.
+- **Response Format**: `text/html; charset=utf-8` (`200 OK` fragment)
+
+### 33. Add 4-Quadrant Reflection Item
+- **Route**: `POST /journal/items`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Form Parameters**: `entry_id`, `entry_date`, `category` ("win" | "problem" | "idea" | "tomorrow"), `content`.
+- **Response**: `303 See Other` → `/journal?date={entry_date}`
+
+### 34. Delete Reflection Item
+- **Route**: `POST /journal/items/{id}/delete`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Query Parameters**: `date`.
+- **Response**: `303 See Other` → `/journal?date={date}`
+
+### 35. Global Command Palette FTS5 Search
+- **Route**: `GET /api/search`
+- **Auth Required**: Yes (`AuthRequired` middleware)
+- **Query Parameters**: `q`.
+- **Response Format**: `text/html; charset=utf-8` (Search Results Fragment)
+
+
 
 ---
 

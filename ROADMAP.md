@@ -11,8 +11,8 @@
 |---------|--------|
 | v0.1.0 — Foundation | ✅ Shipped (2026-07-26) |
 | v0.2.0 — Projects + Tasks | ✅ Shipped (2026-07-26) |
-| v0.3.0 — Knowledge Base + Command Center | ✅ Shipped (2026-07-26) |
-| v0.4.0 — Journal + Global Search | ⬜ Planned |
+| v0.3.0 — Knowledge Base | ✅ Shipped (2026-07-26) |
+| v0.4.0 — Executive Mind-Sync Journal + Global Search | ✅ Shipped (2026-07-26) |
 | v0.5.0 — AI + Finance + Learning | ⬜ Planned |
 | v1.0.0 — Stable | ⬜ Planned |
 

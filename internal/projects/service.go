@@ -152,7 +152,7 @@ func (s *service) ListProjects(ctx context.Context, userID int64, statusFilter s
 		}
 
 		// 2. Tag Filter
-		if tagLower != "" {
+		if tagLower != "" && tagLower != "all" {
 			matchedTag := false
 			for _, tag := range strings.Split(p.TechStack, ",") {
 				if strings.TrimSpace(strings.ToLower(tag)) == tagLower {

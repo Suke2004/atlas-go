@@ -1,0 +1,275 @@
+package journal
+
+import (
+	"fmt"
+	"strings"
+)
+
+templ Journal(details JournalEntryDetails, summary JournalSummary, currentDate string) {
+	<div class="space-y-8" x-data="{
+		activeMode: 'evening',
+		saveStatus: 'Saved',
+		mood: 4,
+		energy: 4,
+		sleep: 7.5
+	}">
+		<!-- Journal & Mind-Sync Hero Banner -->
+		<div class="p-6 md:p-8 rounded-3xl glass-panel relative overflow-hidden">
+			<div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+				<div>
+					<div class="flex items-center gap-3 mb-2">
+						<span class="px-3 py-1 rounded-full badge-tech text-xs uppercase tracking-widest flex items-center gap-1.5 font-mono-code">
+							<i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-rose-400"></i>
+							Executive Mind-Sync
+						</span>
+						<span class="text-xs text-slate-500 font-mono-code">{ currentDate }</span>
+					</div>
+					<h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Daily Reflection & Mind-Sync</h1>
+					<p class="text-slate-400 text-sm mt-1.5 max-w-xl leading-relaxed">
+						Track mental energy, daily work velocity, key wins, and align tomorrow's focus.
+					</p>
+				</div>
+
+				<!-- Mode Selector Switcher -->
+				<div class="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-900 border border-slate-800">
+					<button @click="activeMode = 'morning'" type="button" :class="activeMode === 'morning' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'text-slate-400 hover:text-slate-200'" class="px-4 py-2 rounded-xl text-xs font-bold transition-all border border-transparent flex items-center gap-2">
+						<i data-lucide="sun" class="w-3.5 h-3.5 text-amber-400"></i>
+						<span>Morning Prep</span>
+					</button>
+					<button @click="activeMode = 'evening'" type="button" :class="activeMode === 'evening' ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40' : 'text-slate-400 hover:text-slate-200'" class="px-4 py-2 rounded-xl text-xs font-bold transition-all border border-transparent flex items-center gap-2">
+						<i data-lucide="moon" class="w-3.5 h-3.5 text-indigo-400"></i>
+						<span>Evening Review</span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Executive Mind-Sync Velocity Correlation Banner (USP) -->
+			<div class="mt-8 pt-6 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-3 gap-4">
+				<div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 flex items-center gap-3">
+					<div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
+						<i data-lucide="check-circle-2" class="w-5 h-5"></i>
+					</div>
+					<div>
+						<div class="text-xs text-slate-400 font-mono-code uppercase">Work Velocity</div>
+						<div class="text-base font-extrabold text-white">{ fmt.Sprintf("%d tasks completed", details.MindSync.TasksCompletedToday) }</div>
+					</div>
+				</div>
+
+				<div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 flex items-center gap-3">
+					<div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+						<i data-lucide="book-open" class="w-5 h-5"></i>
+					</div>
+					<div>
+						<div class="text-xs text-slate-400 font-mono-code uppercase">Knowledge Growth</div>
+						<div class="text-base font-extrabold text-white">{ fmt.Sprintf("%d notes created", details.MindSync.NotesCreatedToday) }</div>
+					</div>
+				</div>
+
+				<div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 flex items-center gap-3">
+					<div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold">
+						<i data-lucide="flame" class="w-5 h-5"></i>
+					</div>
+					<div>
+						<div class="text-xs text-slate-400 font-mono-code uppercase">Reflection Streak</div>
+						<div class="text-base font-extrabold text-white">{ fmt.Sprintf("%d days active", summary.StreakDays) }</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Daily Telemetry Form (On-Blur / Auto-Save) -->
+		<form action="/journal/save" method="POST" hx-post="/journal/save" hx-target="#save-indicator" hx-swap="innerHTML" class="space-y-8">
+			<input type="hidden" name="entry_date" value={ currentDate }/>
+
+			<!-- Mood, Energy & Sleep Telemetry Card -->
+			<div class="glass-panel p-6 rounded-3xl space-y-4">
+				<div class="flex items-center justify-between border-b border-slate-800 pb-3">
+					<h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+						<i data-lucide="activity" class="w-4 h-4 text-cyan-400"></i>
+						<span>Daily Mental & Physical Telemetry</span>
+					</h3>
+					<div id="save-indicator">
+						<span class="text-xs text-slate-500 font-mono-code">Auto-saving on change</span>
+					</div>
+				</div>
+
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+					<!-- Mood Rating (1-5) -->
+					<div class="space-y-2">
+						<label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Mood Score (1-5)</label>
+						<select name="mood_rating" @change="$dispatch('submit')" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-800 text-white text-xs font-mono-code focus:outline-none focus:ring-2 focus:ring-indigo-500">
+							<option value="5">5 — Exceptional & Focused</option>
+							<option value="4" selected>4 — Good & Steady</option>
+							<option value="3">3 — Neutral / Mixed</option>
+							<option value="2">2 — Low / Tired</option>
+							<option value="1">1 — Drained / Stressed</option>
+						</select>
+					</div>
+
+					<!-- Energy Rating (1-5) -->
+					<div class="space-y-2">
+						<label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Energy Rating (1-5)</label>
+						<select name="energy_rating" @change="$dispatch('submit')" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-800 text-white text-xs font-mono-code focus:outline-none focus:ring-2 focus:ring-amber-500">
+							<option value="5">5 — High Peak Energy</option>
+							<option value="4" selected>4 — Sustainable Energy</option>
+							<option value="3">3 — Moderate Energy</option>
+							<option value="2">2 — Low Energy</option>
+							<option value="1">1 — Exhausted</option>
+						</select>
+					</div>
+
+					<!-- Sleep Duration (Hours) -->
+					<div class="space-y-2">
+						<label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Sleep Duration (Hours)</label>
+						<input type="number" step="0.5" name="sleep_hours" value="7.5" @change="$dispatch('submit')" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-800 text-white text-xs font-mono-code focus:outline-none focus:ring-2 focus:ring-cyan-500"/>
+					</div>
+				</div>
+
+				<!-- Daily Executive Summary Textarea -->
+				<div class="pt-4 border-t border-slate-800/80">
+					<label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Daily Executive Synthesis</label>
+					<textarea name="summary" @blur="$dispatch('submit')" rows="3" placeholder="Summarize your key mental state, breakthroughs, and primary focus for today..." class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-800 text-white text-sm leading-relaxed placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">{ details.Entry.Summary }</textarea>
+				</div>
+			</div>
+		</form>
+
+		<!-- 4-Quadrant Reflection Grid -->
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<!-- Wins Quadrant -->
+			<div class="glass-panel p-6 rounded-3xl space-y-4">
+				<div class="flex items-center justify-between border-b border-slate-800 pb-3">
+					<h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+						<i data-lucide="trophy" class="w-4 h-4"></i>
+						<span>Wins & Achievements ({ fmt.Sprintf("%d", len(details.Wins)) })</span>
+					</h3>
+				</div>
+
+				<form action="/journal/items" method="POST" hx-boost="true" class="flex gap-2">
+					<input type="hidden" name="entry_id" value={ fmt.Sprintf("%d", details.Entry.ID) }/>
+					<input type="hidden" name="entry_date" value={ currentDate }/>
+					<input type="hidden" name="category" value="win"/>
+					<input type="text" name="content" required placeholder="Add a win today..." class="w-full px-3.5 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"/>
+					<button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md">Add</button>
+				</form>
+
+				<div class="space-y-2">
+					for _, item := range details.Wins {
+						<div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-center justify-between text-xs text-slate-200">
+							<div class="flex items-center gap-2">
+								<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+								<span>{ item.Content }</span>
+							</div>
+							<form action={ templ.URL(fmt.Sprintf("/journal/items/%d/delete?date=%s", item.ID, currentDate)) } method="POST">
+								<button type="submit" class="text-slate-500 hover:text-rose-400 p-1">
+									<i data-lucide="x" class="w-3.5 h-3.5"></i>
+								</button>
+							</form>
+						</div>
+					}
+				</div>
+			</div>
+
+			<!-- Challenges Quadrant -->
+			<div class="glass-panel p-6 rounded-3xl space-y-4">
+				<div class="flex items-center justify-between border-b border-slate-800 pb-3">
+					<h3 class="text-sm font-bold text-rose-400 uppercase tracking-wider flex items-center gap-2">
+						<i data-lucide="alert-triangle" class="w-4 h-4"></i>
+						<span>Challenges & Blockers ({ fmt.Sprintf("%d", len(details.Problems)) })</span>
+					</h3>
+				</div>
+
+				<form action="/journal/items" method="POST" hx-boost="true" class="flex gap-2">
+					<input type="hidden" name="entry_id" value={ fmt.Sprintf("%d", details.Entry.ID) }/>
+					<input type="hidden" name="entry_date" value={ currentDate }/>
+					<input type="hidden" name="category" value="problem"/>
+					<input type="text" name="content" required placeholder="Add a challenge..." class="w-full px-3.5 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"/>
+					<button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md">Add</button>
+				</form>
+
+				<div class="space-y-2">
+					for _, item := range details.Problems {
+						<div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-center justify-between text-xs text-slate-200">
+							<div class="flex items-center gap-2">
+								<i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-400"></i>
+								<span>{ item.Content }</span>
+							</div>
+							<form action={ templ.URL(fmt.Sprintf("/journal/items/%d/delete?date=%s", item.ID, currentDate)) } method="POST">
+								<button type="submit" class="text-slate-500 hover:text-rose-400 p-1">
+									<i data-lucide="x" class="w-3.5 h-3.5"></i>
+								</button>
+							</form>
+						</div>
+					}
+				</div>
+			</div>
+
+			<!-- Ideas Quadrant -->
+			<div class="glass-panel p-6 rounded-3xl space-y-4">
+				<div class="flex items-center justify-between border-b border-slate-800 pb-3">
+					<h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+						<i data-lucide="lightbulb" class="w-4 h-4"></i>
+						<span>Ideas & Breakthroughs ({ fmt.Sprintf("%d", len(details.Ideas)) })</span>
+					</h3>
+				</div>
+
+				<form action="/journal/items" method="POST" hx-boost="true" class="flex gap-2">
+					<input type="hidden" name="entry_id" value={ fmt.Sprintf("%d", details.Entry.ID) }/>
+					<input type="hidden" name="entry_date" value={ currentDate }/>
+					<input type="hidden" name="category" value="idea"/>
+					<input type="text" name="content" required placeholder="Add an idea..." class="w-full px-3.5 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"/>
+					<button type="submit" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-md">Add</button>
+				</form>
+
+				<div class="space-y-2">
+					for _, item := range details.Ideas {
+						<div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-center justify-between text-xs text-slate-200">
+							<div class="flex items-center gap-2">
+								<i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+								<span>{ item.Content }</span>
+							</div>
+							<form action={ templ.URL(fmt.Sprintf("/journal/items/%d/delete?date=%s", item.ID, currentDate)) } method="POST">
+								<button type="submit" class="text-slate-500 hover:text-rose-400 p-1">
+									<i data-lucide="x" class="w-3.5 h-3.5"></i>
+								</button>
+							</form>
+						</div>
+					}
+				</div>
+			</div>
+
+			<!-- Tomorrow's Focus Quadrant -->
+			<div class="glass-panel p-6 rounded-3xl space-y-4">
+				<div class="flex items-center justify-between border-b border-slate-800 pb-3">
+					<h3 class="text-sm font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+						<i data-lucide="target" class="w-4 h-4"></i>
+						<span>Tomorrow's Focus ({ fmt.Sprintf("%d", len(details.Tomorrow)) })</span>
+					</h3>
+				</div>
+
+				<form action="/journal/items" method="POST" hx-boost="true" class="flex gap-2">
+					<input type="hidden" name="entry_id" value={ fmt.Sprintf("%d", details.Entry.ID) }/>
+					<input type="hidden" name="entry_date" value={ currentDate }/>
+					<input type="hidden" name="category" value="tomorrow"/>
+					<input type="text" name="content" required placeholder="Add a target for tomorrow..." class="w-full px-3.5 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"/>
+					<button type="submit" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-md">Add</button>
+				</form>
+
+				<div class="space-y-2">
+					for _, item := range details.Tomorrow {
+						<div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-center justify-between text-xs text-slate-200">
+							<div class="flex items-center gap-2">
+								<i data-lucide="arrow-right-circle" class="w-3.5 h-3.5 text-cyan-400"></i>
+								<span>{ item.Content }</span>
+							</div>
+							<form action={ templ.URL(fmt.Sprintf("/journal/items/%d/delete?date=%s", item.ID, currentDate)) } method="POST">
+								<button type="submit" class="text-slate-500 hover:text-rose-400 p-1">
+									<i data-lucide="x" class="w-3.5 h-3.5"></i>
+								</button>
+							</form>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+}

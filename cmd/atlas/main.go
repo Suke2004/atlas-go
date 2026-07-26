@@ -22,9 +22,11 @@ import (
 	"github.com/Suke2004/atlas-go/internal/config"
 	"github.com/Suke2004/atlas-go/internal/db"
 	"github.com/Suke2004/atlas-go/internal/health"
+	"github.com/Suke2004/atlas-go/internal/journal"
 	"github.com/Suke2004/atlas-go/internal/logger"
 	"github.com/Suke2004/atlas-go/internal/notes"
 	"github.com/Suke2004/atlas-go/internal/projects"
+	"github.com/Suke2004/atlas-go/internal/search"
 	"github.com/Suke2004/atlas-go/internal/setup"
 	"github.com/Suke2004/atlas-go/internal/tasks"
 	dashtemplates "github.com/Suke2004/atlas-go/web/templates/dashboard"
@@ -92,6 +94,13 @@ func main() {
 	notesRepo := notes.NewRepository(database)
 	notesSvc := notes.NewService(notesRepo, projectsRepo)
 	notesHandler := notes.NewHandler(notesSvc, projectsRepo, log)
+
+	journalRepo := journal.NewRepository(database)
+	journalSvc := journal.NewService(journalRepo, tasksSvc, notesSvc)
+	journalHandler := journal.NewHandler(journalSvc, log)
+
+	searchSvc := search.NewService(database, projectsSvc, tasksSvc, notesSvc)
+	searchHandler := search.NewHandler(searchSvc, log)
 
 	// ── 6. Router ──────────────────────────────────────────────────────────
 	r := chi.NewRouter()
@@ -172,6 +181,15 @@ func main() {
 		protected.Post("/notes/{id}/autosave", notesHandler.Autosave)
 		protected.Post("/notes/{id}/pin", notesHandler.TogglePin)
 		protected.Post("/notes/{id}/delete", notesHandler.Delete)
+
+		// Journal Module Routes
+		protected.Get("/journal", journalHandler.Index)
+		protected.Post("/journal/save", journalHandler.Save)
+		protected.Post("/journal/items", journalHandler.AddItem)
+		protected.Post("/journal/items/{id}/delete", journalHandler.DeleteItem)
+
+		// Global Search API Route
+		protected.Get("/api/search", searchHandler.Search)
 	})
 
 	// ── 7. Server ──────────────────────────────────────────────────────────

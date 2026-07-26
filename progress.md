@@ -53,8 +53,8 @@
 | 5 | Tasks Module | ✅ | 2026-07-26 | 2026-07-26 | List, 3-column Kanban, Slate Obsidian theme, Lucide icons, task dependencies |
 | 6 | Knowledge Base | ✅ | 2026-07-26 | 2026-07-26 | Markdown editor, Quick Capture, Templates, [[Wiki Links]], Backlinks, 30s autosave |
 | 7 | Dashboard | ✅ | 2026-07-26 | 2026-07-26 | Executive Command Center live widgets |
-| 8 | Journal Module | ⬜ | — | — | Mood/energy/sleep, on-blur save |
-| 9 | Global Search | ⬜ | — | — | Ctrl+K, SQLite FTS5 |
+| 8 | Journal Module | ✅ | 2026-07-26 | 2026-07-26 | Executive Mind-Sync, Mood/energy/sleep telemetry, 4-quadrant reflection |
+| 9 | Global Search | ✅ | 2026-07-26 | 2026-07-26 | Ctrl+K Command Palette modal overlay, SQLite FTS5 |
 | 10 | Settings + Polish | ⬜ | — | — | Theme toggle, skeleton loaders, toasts |
 
 ---

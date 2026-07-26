@@ -44,6 +44,36 @@ templ Base(title string, currentPath string, username string, content templ.Comp
 			<!-- Global Toast Container -->
 			<div id="toast-container" class="fixed bottom-6 right-6 space-y-3 z-50 pointer-events-none [&>*]:pointer-events-auto"></div>
 
+			<!-- Global Ctrl+K Command Palette Modal Overlay -->
+			<div x-data="{ open: false }"
+				@keydown.window.cmd.k.prevent="open = true"
+				@keydown.window.ctrl.k.prevent="open = true"
+				@keydown.escape.window="open = false"
+				x-show="open"
+				x-cloak
+				class="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-slate-950/80 backdrop-blur-md">
+				
+				<div @click.away="open = false" class="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden space-y-3">
+					<div class="p-4 border-b border-slate-800 flex items-center gap-3">
+						<i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
+						<input type="text"
+							placeholder="Type to search projects, tasks, notes... (Esc to close)"
+							hx-get="/api/search"
+							hx-trigger="keyup changed delay:200ms"
+							hx-target="#cmd-palette-results"
+							class="w-full bg-transparent text-white font-semibold text-sm focus:outline-none placeholder-slate-500"
+							autofocus/>
+						<span class="px-2 py-1 rounded-lg bg-slate-800 text-[10px] font-mono-code text-slate-400">Esc</span>
+					</div>
+
+					<div id="cmd-palette-results" class="max-h-96 overflow-y-auto p-2">
+						<div class="p-6 text-center text-xs text-slate-500 font-mono-code">
+							Start typing to search workspace...
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<script>
 				lucide.createIcons();
 				document.body.addEventListener('htmx:afterSwap', function() {

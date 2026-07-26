@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.4.0] - 2026-07-26
+
+### Added
+- **Executive Mind-Sync & Journal Module**:
+  - Industry-first Executive Mind-Sync velocity correlation engine connecting daily tasks completed and notes created to mood & energy telemetry.
+  - Morning Prep vs. Evening Review dual-mode reflection routines.
+  - 4-Quadrant reflection cards: **Wins & Achievements**, **Challenges & Blockers**, **Ideas & Breakthroughs**, and **Tomorrow's Focus**.
+  - Mood score (1-5), Energy rating (1-5), Sleep duration tracking, and on-blur background auto-save.
+- **Global `Ctrl+K` Command Palette Search**:
+  - Global `Ctrl+K` / `Cmd+K` keyboard modal overlay available anywhere in Atlas.
+  - Powered by SQLite FTS5 full-text search across Projects, Tasks, and Notes.
+
+---
+
 ## [v0.3.0] - 2026-07-26
 
 ### Added
