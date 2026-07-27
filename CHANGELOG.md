@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.7.0] - 2026-07-27
+
+### Added
+- **Analytics & Insights Engine (`/analytics`)**:
+  - 365-day GitHub-style contribution activity heatmap scaling by activity level across all modules.
+  - Telemetry counters tracking Total Contributions, Current Active Streak, and Longest Streak Record.
+  - Automated AI Weekly Review Synthesis endpoint powered by active AI provider (`Gemini` or `Ollama`).
+  - Current month category expense breakdown distribution cards.
+
+---
+
 ## [v0.6.0] - 2026-07-26
 
 ### Added

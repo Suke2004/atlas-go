@@ -1,0 +1,159 @@
+package analytics
+
+import (
+	"fmt"
+)
+
+func getHeatmapColor(level int) string {
+	switch level {
+	case 4:
+		return "bg-indigo-500 border-indigo-400"
+	case 3:
+		return "bg-indigo-600 border-indigo-500"
+	case 2:
+		return "bg-indigo-800 border-indigo-700"
+	case 1:
+		return "bg-indigo-950 border-indigo-900"
+	default:
+		return "bg-slate-900/60 border-slate-800/80"
+	}
+}
+
+templ Analytics(data AnalyticsData) {
+	<div
+		class="space-y-8"
+		x-data="{
+			generating: false,
+			reviewText: '',
+			reviewError: '',
+			async generateReview() {
+				this.generating = true;
+				this.reviewText = '';
+				this.reviewError = '';
+				try {
+					const resp = await fetch('/analytics/weekly-review', { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+					const res = await resp.json();
+					if (res.error) { this.reviewError = res.error; } else { this.reviewText = res.review; }
+				} catch(e) {
+					this.reviewError = 'Network error generating review.';
+				} finally {
+					this.generating = false;
+				}
+			}
+		}"
+	>
+		<!-- Header -->
+		<div class="p-6 md:p-8 rounded-3xl glass-panel relative overflow-hidden">
+			<div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+				<div>
+					<div class="flex items-center gap-3 mb-2">
+						<span class="px-3 py-1 rounded-full badge-tech text-xs uppercase tracking-widest flex items-center gap-1.5 font-mono-code">
+							<i data-lucide="line-chart" class="w-3.5 h-3.5 text-cyan-400"></i>
+							System Intelligence
+						</span>
+					</div>
+					<h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Analytics &amp; Heatmap</h1>
+					<p class="text-slate-400 text-sm mt-1.5 max-w-xl leading-relaxed">
+						Visualise activity metrics across all modules over the past 365 days and synthesize AI performance reviews.
+					</p>
+				</div>
+				<button
+					type="button"
+					@click="generateReview()"
+					:disabled="generating"
+					class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-xl shadow-indigo-500/20 flex items-center gap-2.5 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
+				>
+					<i data-lucide="sparkles" class="w-4 h-4" x-show="!generating"></i>
+					<i data-lucide="loader-2" class="w-4 h-4 animate-spin" x-show="generating" x-cloak></i>
+					<span x-text="generating ? 'Synthesizing...' : 'Generate AI Weekly Review'"></span>
+				</button>
+			</div>
+		</div>
+
+		<!-- Summary Stats Grid -->
+		<div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+			<div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+				<div class="flex items-center gap-3 mb-2 text-slate-400">
+					<i data-lucide="activity" class="w-4 h-4 text-indigo-400"></i>
+					<span class="text-xs font-semibold uppercase tracking-wider">Total System Activity</span>
+				</div>
+				<p class="text-3xl font-extrabold text-white font-mono-code">{ fmt.Sprintf("%d", data.Metrics.TotalContributions) }</p>
+				<p class="text-xs text-slate-500 mt-1">Actions across all 6 modules (365d)</p>
+			</div>
+			<div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+				<div class="flex items-center gap-3 mb-2 text-slate-400">
+					<i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+					<span class="text-xs font-semibold uppercase tracking-wider">Active Streak</span>
+				</div>
+				<p class="text-3xl font-extrabold text-amber-400 font-mono-code">{ fmt.Sprintf("%d days", data.Metrics.CurrentStreak) }</p>
+				<p class="text-xs text-slate-500 mt-1">Consecutive days of system interaction</p>
+			</div>
+			<div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+				<div class="flex items-center gap-3 mb-2 text-slate-400">
+					<i data-lucide="trophy" class="w-4 h-4 text-emerald-400"></i>
+					<span class="text-xs font-semibold uppercase tracking-wider">Longest Streak</span>
+				</div>
+				<p class="text-3xl font-extrabold text-white font-mono-code">{ fmt.Sprintf("%d days", data.Metrics.LongestStreak) }</p>
+				<p class="text-xs text-slate-500 mt-1">Personal best active streak record</p>
+			</div>
+		</div>
+
+		<!-- AI Weekly Review Result Container -->
+		<div x-show="reviewText || reviewError" x-transition class="p-6 rounded-2xl bg-violet-950/20 border border-violet-500/30 space-y-3">
+			<h3 class="text-base font-bold text-violet-300 flex items-center gap-2">
+				<i data-lucide="sparkles" class="w-4 h-4"></i>
+				AI Weekly Performance Synthesis
+			</h3>
+			<div x-show="reviewText" class="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap font-sans" x-text="reviewText"></div>
+			<div x-show="reviewError" class="text-sm text-rose-400 flex items-center gap-2" x-text="reviewError"></div>
+		</div>
+
+		<!-- GitHub-Style Contribution Heatmap -->
+		<div class="p-6 md:p-8 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-4">
+			<div class="flex items-center justify-between">
+				<h2 class="text-lg font-bold text-white flex items-center gap-2">
+					<i data-lucide="calendar" class="w-5 h-5 text-indigo-400"></i>
+					365-Day Activity Grid
+				</h2>
+				<div class="flex items-center gap-2 text-xs text-slate-400 font-mono-code">
+					<span>Less</span>
+					<div class="w-3 h-3 rounded-sm bg-slate-900/60 border border-slate-800/80"></div>
+					<div class="w-3 h-3 rounded-sm bg-indigo-950 border border-indigo-900"></div>
+					<div class="w-3 h-3 rounded-sm bg-indigo-800 border border-indigo-700"></div>
+					<div class="w-3 h-3 rounded-sm bg-indigo-600 border border-indigo-500"></div>
+					<div class="w-3 h-3 rounded-sm bg-indigo-500 border border-indigo-400"></div>
+					<span>More</span>
+				</div>
+			</div>
+
+			<div class="overflow-x-auto pb-2">
+				<div class="inline-grid grid-rows-7 grid-flow-col gap-1.5">
+					for _, day := range data.Heatmap {
+						<div
+							title={ fmt.Sprintf("%s: %d contributions", day.Date, day.Count) }
+							class={ "w-3.5 h-3.5 rounded-sm border transition-all hover:scale-125 cursor-pointer " + getHeatmapColor(day.Level) }
+						></div>
+					}
+				</div>
+			</div>
+		</div>
+
+		<!-- Category Expenses Breakdown -->
+		if len(data.Metrics.CategoryExpenses) > 0 {
+			<div class="p-6 md:p-8 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-4">
+				<h2 class="text-lg font-bold text-white flex items-center gap-2">
+					<i data-lucide="pie-chart" class="w-5 h-5 text-emerald-400"></i>
+					Current Month Expense Distribution
+				</h2>
+				<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+					for _, exp := range data.Metrics.CategoryExpenses {
+						<div class="p-4 rounded-xl bg-slate-800/40 border border-slate-700/40 flex justify-between items-center">
+							<span class="text-sm text-slate-300 font-medium capitalize">{ exp.Category }</span>
+							<span class="text-sm font-bold text-white font-mono-code">{ fmt.Sprintf("$%.2f", exp.TotalAmount) }</span>
+						</div>
+					}
+				</div>
+			</div>
+		}
+	</div>
+}

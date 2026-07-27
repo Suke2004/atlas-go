@@ -58,6 +58,8 @@
 | 10 | Settings + Polish | ✅ | 2026-07-26 | 2026-07-26 | Theme toggle, skeleton loaders, toasts |
 | 11 | Finance Engine | ✅ | 2026-07-26 | 2026-07-26 | Cash flow, zero-based budget, Project Infrastructure Cost Attribution USP |
 | 12 | Tech Skill Roadmap | ✅ | 2026-07-26 | 2026-07-26 | Interactive skill tree, study sessions, Mastery XP USP |
+| 13 | Documents Engine | ✅ | 2026-07-26 | 2026-07-26 | File uploads, PDF/image preview, AI summaries, FTS5 |
+| 14 | Analytics & Insights | ✅ | 2026-07-27 | 2026-07-27 | 365d heatmap, streak counter, AI weekly review synthesis |
 
 ---
 
@@ -346,6 +348,7 @@ Only after every box is checked is the milestone truly complete.
 | 8 — Journal | [docs/retros/phase-8-9.md](docs/retros/phase-8-9.md) | ✅ Written |
 | 9 — Search | [docs/retros/phase-9.md](docs/retros/phase-9.md) | ✅ Written |
 | 10 — Settings | [docs/retros/phase-10.md](docs/retros/phase-10.md) | ✅ Written |
+| 14 — Analytics | [docs/retros/phase-14.md](docs/retros/phase-14.md) | ✅ Written |
 
 ---
 

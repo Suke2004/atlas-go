@@ -22,6 +22,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Suke2004/atlas-go/internal/ai"
+	"github.com/Suke2004/atlas-go/internal/analytics"
 	"github.com/Suke2004/atlas-go/internal/auth"
 	"github.com/Suke2004/atlas-go/internal/config"
 	"github.com/Suke2004/atlas-go/internal/db"
@@ -131,6 +132,11 @@ func main() {
 	docsSvc := documents.NewService(docsRepo, aiProvider)
 	docsHandler := documents.NewHandler(docsSvc, log)
 
+	// Analytics module
+	analyticsRepo := analytics.NewRepository(database)
+	analyticsSvc := analytics.NewService(analyticsRepo, aiProvider)
+	analyticsHandler := analytics.NewHandler(analyticsSvc, log)
+
 	// ── 6. Router ──────────────────────────────────────────────────────────
 	r := chi.NewRouter()
 
@@ -232,6 +238,10 @@ func main() {
 		protected.Post("/learning/tracks", learningHandler.CreateTrack)
 		protected.Post("/learning/sessions", learningHandler.AddSession)
 		protected.Post("/learning/tracks/{id}/delete", learningHandler.DeleteTrack)
+
+		// Analytics Module Routes
+		protected.Get("/analytics", analyticsHandler.Index)
+		protected.Post("/analytics/weekly-review", analyticsHandler.GenerateWeeklyReview)
 
 		// Documents Module Routes
 		protected.Get("/documents", docsHandler.List)

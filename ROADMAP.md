@@ -15,6 +15,7 @@
 | v0.4.0 — Executive Mind-Sync Journal + Global Search | ✅ Shipped (2026-07-26) |
 | v0.5.0 — Finance Engine + Tech Skill Roadmap | ✅ Shipped (2026-07-26) |
 | v0.6.0 — Documents Engine & AI Provider Switching | ✅ Shipped (2026-07-26) |
+| v0.7.0 — Analytics & Insights Engine | ✅ Shipped (2026-07-27) |
 | v1.0.0 — Stable | ⬜ Planned |
 
 ---

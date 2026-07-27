@@ -53,6 +53,10 @@ templ Sidebar(currentPath string, username string) {
 
 			<div class="pt-4">
 				<div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Intelligence</div>
+				<a href="/analytics" hx-boost="true" class={ navClass(currentPath == "/analytics") }>
+					<i data-lucide="line-chart" class="w-4 h-4"></i>
+					<span>Analytics</span>
+				</a>
 				<a href="/documents" hx-boost="true" class={ navClass(currentPath == "/documents") }>
 					<i data-lucide="library" class="w-4 h-4"></i>
 					<span>Documents</span>
